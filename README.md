@@ -34,7 +34,12 @@ Since API is not yet defined, it is not wise yet to publish it.
 
 ## Tests
 
-Currently there are no automated tests.
+Currently there is only a stub test. 
+To run it, run the following command:
+
+```
+cd tests && ctest
+```
 
 ## Contributors
 

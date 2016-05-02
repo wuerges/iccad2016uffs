@@ -13,4 +13,4 @@ target_link_libraries(TestParser1.x
 )
 
 add_test(check_if_spirit_runs TestSpirit1.x)
-add_test(check_if_parser_runs TestParser1.x < ../testcases/BDD/in_1.v)
+add_test(check_if_parser_runs TestParser1.x ../testcases/BDD/in_1.v)

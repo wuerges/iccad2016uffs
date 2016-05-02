@@ -1,6 +1,6 @@
 ## Synopsis
 
-This project is (or aims to):
+This project is (or aims to be):
 
 1. A solution to the [Problem B](http://cad-contest-2016.el.cycu.edu.tw/problem_B/default.html) of the ICCAD 2016 Contest.
 

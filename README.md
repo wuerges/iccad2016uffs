@@ -20,10 +20,6 @@ Since the project is in its beginnings, there is not much in this section.
 
 Testing circuits is not easy and we need more tools to do it.
 
-## Installation
-
-This projects aims to reduce the amount of depencies to the most. 
-
 ## Usage
 
 Nothing much can be done yet.
@@ -31,6 +27,18 @@ Nothing much can be done yet.
 ## API Reference
 
 Since API is not yet defined, it is not wise yet to publish it.
+
+## Installation
+
+This projects aims to reduce the amount of depencies to the most. However it needs cmake and boost spirit 3.0.
+
+To compile it, run the following commands:
+
+```
+cmake .
+make
+```
+
 
 ## Tests
 

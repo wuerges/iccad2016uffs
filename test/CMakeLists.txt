@@ -1,5 +1,3 @@
-# This file describes the testcases
-
 include(CTest)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
@@ -17,5 +15,9 @@ target_link_libraries(TestParser1.x
   ${Boost_SYSTEM_LIBRARY}
 )
 
+
+
 add_test(check_if_spirit_runs TestSpirit1.x)
+
+# Novos testes devem ser adicionados aqui 
 add_test(check_if_parser_runs TestParser1.x ../testcases/BDD/in_1.v)

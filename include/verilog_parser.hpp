@@ -1,58 +1,15 @@
-#define BOOST_SPIRIT_X3_DEBUG
+#include <verilog_model.hpp>
 
-#include "boost/spirit/include/classic.hpp"
-
-
-
+#include <boost/spirit/include/classic.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/home/x3.hpp>
 
-#include <boost/lambda/lambda.hpp>
-#include <boost/bind.hpp>
-
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/variant.hpp>
 
-
-namespace parser 
-{
-  namespace ast {
-    struct Function {
-      std::string op;
-      std::vector<std::string> parameters;
-      Function(auto op_, auto par_): op(op_), parameters(par_) {}
-    };
-    struct Verilog {
-
-      std::vector<std::string> inputs, outputs, wires, ports;
-      std::vector<Function> functions;
-
-      void add_inputs(std::vector<std::string> const & vs) {
-        inputs.insert(inputs.end(), vs.begin(), vs.end());
-      }
-
-      void add_outputs(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
-      }
-      
-      void add_wires(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
-      }
-
-      void add_ports(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
-      }
-
-      void add_function(std::string const & op, std::vector<std::string> const & vs) {
-        functions.push_back(Function(op, vs));
-      }
-
-    };
-  }
-}
+namespace verilog {
 
 namespace parser
 {
@@ -60,7 +17,8 @@ namespace parser
     namespace ascii = boost::spirit::x3::ascii;
 
     template <typename Iterator>
-    int parse_verilog(Iterator first, Iterator last)
+    int parse_verilog(verilog::ast::Verilog &v, 
+        Iterator first, Iterator last)
     {
       using x3::lit;
       using x3::char_;
@@ -68,8 +26,6 @@ namespace parser
       using x3::string;
       using x3::phrase_parse;
       using ascii::space;
-
-      ast::Verilog v;
 
       auto module_lit    = lit("module");
       auto endmodule_lit = lit("endmodule");
@@ -140,5 +96,7 @@ namespace parser
 
       return 0;
     }
+
+}
 
 }

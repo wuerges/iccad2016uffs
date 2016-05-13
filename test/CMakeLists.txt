@@ -29,4 +29,4 @@ add_test(check_if_spirit_runs TestSpirit1.x)
 
 add_test(check_if_parser_runs TestParser1.x ../testcases/BDD/in_1.v)
 
-add_test(check_if_parser_runs TestConvert1.x ../testcases/BDD/in_1.v)
+add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)

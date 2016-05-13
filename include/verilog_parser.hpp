@@ -1,3 +1,5 @@
+#pragma once
+
 #include <verilog_model.hpp>
 
 #include <boost/spirit/include/classic.hpp>

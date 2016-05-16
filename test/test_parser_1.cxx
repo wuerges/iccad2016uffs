@@ -8,16 +8,27 @@
 #include <vector>
 #include <boost/spirit/include/support_istream_iterator.hpp>
 
-int
-main(int nargs, char** argv)
+
+int teste(std::string s)
 {
-  verilog::ast::Verilog v;
-  using boost::spirit::istream_iterator;
-
-  std::ifstream input(argv[1]);
-  input.unsetf(std::ios::skipws);
-
-  istream_iterator begin(input);
-  istream_iterator end;
-  return verilog::parser::parse_verilog(v, begin, end);
+	verilog::ast::Verilog v;
+	using boost::spirit::istream_iterator;
+	
+	std::ifstream input(s);
+	input.unsetf(std::ios::skipws);
+	
+	istream_iterator begin(input);
+	istream_iterator end;
+	return verilog::parser::parse_verilog(v, begin, end);
 }
+
+int main()
+{
+	std::vector<std::string> s = {"../testcases/TEST/cir1.v", "../testcases/TEST/cir2.v"};
+	for(int i = 0; i < s.size(); i++)
+		teste(s[i]);
+	
+	return 0;
+}
+
+

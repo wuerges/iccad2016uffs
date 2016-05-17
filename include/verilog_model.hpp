@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,11 +26,11 @@ namespace verilog
       }
       
       void add_wires(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
+	wires.insert(wires.end(), vs.begin(), vs.end());
       }
 
       void add_ports(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
+        ports.insert(ports.end(), vs.begin(), vs.end());
       }
 
       void add_function(std::string const & op, std::vector<std::string> const & vs) {

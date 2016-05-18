@@ -37,9 +37,11 @@ namespace parser
 
       typedef std::vector<std::string> string_vector; 
 
+	  // auto print_debug = [&](auto &c){ std::cout << "DEBUG: " << _attr(c) << std::endl; };
+      
       auto identifier 
         = x3::rule<class identifier, std::string>{}
-        = +char_("a-zA-Z0-9_");
+        = (char_("a-zA-Z_") > *char_("a-zA-Z0-9_")) | string("1'b0") | string("1'b1");
       auto identifier_list = identifier % ',';
 
       auto add_inputs = [&](auto &c){ v.add_inputs(_attr(c)); };
@@ -56,8 +58,9 @@ namespace parser
 
       std::string op;
       auto set_function_op = [&](auto &c){ op = _attr(c); };
-      auto function_name = 
-        x3::string("and") 
+      auto function_name 
+        = x3::rule<class function_name, std::string>{}
+        = x3::string("and") 
         | string("nand") 
         | string("or") 
         | string("nor") 
@@ -69,7 +72,7 @@ namespace parser
 
       auto add_function = [&](auto &c){ v.add_function(op, _attr(c)); };
       auto function_decl 
-        = function_name > 
+        = function_name_op > 
         '(' > identifier_list[add_function] > ')' > ';';
 
 
@@ -87,9 +90,15 @@ namespace parser
           >> -( '(' >> -identifier_list >> ')' ) > ';'
           >> module_body 
           >> endmodule_lit;
+	
+	  auto cpp_style_comment = "//" > *(~char_('\n')) > char_('\n');
+	  auto rest_of_cpp_comment = *(~char_('\n')) > char_('\n');
+	  auto rest_of_c_comment = *(~char_('*') > ~char_('/')) > "*/";
+	  
+	  auto comment = +space | (char_('/') >> ((char_('/') >> rest_of_cpp_comment) | (char_('*') > rest_of_c_comment)));
 
       phrase_parse(first, last,
-          module >> x3::eoi, space);
+          module >> x3::eoi, comment);
 
       if (first != last) {
         std::cout << "ERROR: PARSE FAILED" << std::endl;

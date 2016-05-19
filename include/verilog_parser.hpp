@@ -57,16 +57,17 @@ namespace parser
         = wire_lit > identifier_list[add_wires] > ';';
 
       std::string op;
+      
       auto set_function_op = [&](auto &c){ op = _attr(c); };
       auto function_name 
         = x3::rule<class function_name, std::string>{}
-        = x3::string("and") 
+        = string("and")   
         | string("nand") 
-        | string("or") 
-        | string("nor") 
-        | string("xor") 
+        | string("or")   
+        | string("nor")  
+        | string("xor")  
         | string("xnor") 
-        | string("not")
+        | string("not")  
         | string("buf");
       auto function_name_op = function_name[set_function_op];
 
@@ -74,8 +75,6 @@ namespace parser
       auto function_decl 
         = function_name_op > 
         '(' > identifier_list[add_function] > ')' > ';';
-
-
 
       auto module_body 
         = +(input_decl 

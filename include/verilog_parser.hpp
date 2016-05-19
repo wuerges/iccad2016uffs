@@ -84,10 +84,13 @@ namespace parser
           | function_decl
           );
 
+      
+      auto add_ports = [&](auto &c){ v.add_ports(_attr(c)); };
+      
       auto module 
         = module_lit 
           > identifier 
-          >> -( '(' >> -identifier_list >> ')' ) > ';'
+	>> -( '(' >> -identifier_list[add_ports] >> ')' ) > ';'
           >> module_body 
           >> endmodule_lit;
 	

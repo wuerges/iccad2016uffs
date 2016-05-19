@@ -60,7 +60,7 @@ namespace verilog
       }
       
       void add_wires(std::vector<std::string> const & vs) {
-	wires.insert(wires.end(), vs.begin(), vs.end());
+        wires.insert(wires.end(), vs.begin(), vs.end());
       }
 
       void add_ports(std::vector<std::string> const & vs) {

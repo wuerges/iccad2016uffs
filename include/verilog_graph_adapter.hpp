@@ -8,7 +8,11 @@
 namespace verilog {
 
   void add_function_and(ast::Function & f, graph::G & g) {
-
+    std::string dest = f.parameters.back();
+    for(auto it = f.parameters.begin();
+        it != --f.parameters.end();  ++it) {
+      g.add_edge(*it,dest, graph::NegP::Positive);
+    }
   }
 
   void convert(ast::Verilog & v, graph::G &g) {

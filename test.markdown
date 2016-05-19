@@ -4,4 +4,4 @@ Colons can be used to align columns.
 |---|:---:|---:|
 |*col 3 is*|*right-aligned*|*$1600*|
 |_col 2 is_|_centered_|_$12_|
-|"zebra stripes"|"are neat"|"$1"|
+|zebra stripes|are neat|$1|

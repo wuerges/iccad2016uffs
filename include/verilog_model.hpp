@@ -7,10 +7,15 @@
 namespace verilog 
 {
   namespace ast {
+
+    enum class Opcode {
+      And, Nand, Or, Nor, Xor, Xnor, Buf, Not
+    };
+
     struct Function {
-      std::string op;
+      Opcode op;
       std::vector<std::string> parameters;
-      Function(auto op_, auto par_): op(op_), parameters(par_) {}
+      Function(Opcode op_, auto par_): op(op_), parameters(par_) {}
     };
     struct Verilog {
 
@@ -33,7 +38,7 @@ namespace verilog
         outputs.insert(outputs.end(), vs.begin(), vs.end());
       }
 
-      void add_function(std::string const & op, std::vector<std::string> const & vs) {
+      void add_function(ast::Opcode const & op, std::vector<std::string> const & vs) {
         functions.push_back(Function(op, vs));
       }
 

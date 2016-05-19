@@ -3,14 +3,43 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace verilog 
 {
   namespace ast {
 
     enum class Opcode {
-      And, Nand, Or, Nor, Xor, Xnor, Buf, Not
+      Nand, And, Or, Nor, Xor, Xnor, Buf, Not
     };
+
+      std::map<Opcode, std::string> opcode_string_map = {
+        {Opcode::And , "and" },
+        {Opcode::Nand, "nand"},
+        {Opcode::Or  , "or"  },
+        {Opcode::Nor , "nor" },
+        {Opcode::Xor , "xor" },
+        {Opcode::Xnor, "xnor"},
+        {Opcode::Buf , "buf" },
+        {Opcode::Not , "not" }
+      };
+
+      std::map<std::string, Opcode> string_opcode_map = {
+        {"and" , Opcode::And },
+        {"nand", Opcode::Nand},
+        {"or"  , Opcode::Or  },
+        {"nor" , Opcode::Nor },
+        {"xor" , Opcode::Xor },
+        {"xnor", Opcode::Xnor},
+        {"buf" , Opcode::Buf },
+        {"not" , Opcode::Not }
+      };
+
+
+     std::ostream& operator<< (std::ostream& stream, const Opcode& op) {
+     stream << opcode_string_map[op];
+      return stream;
+    }
 
     struct Function {
       Opcode op;
@@ -31,15 +60,15 @@ namespace verilog
       }
       
       void add_wires(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
+	wires.insert(wires.end(), vs.begin(), vs.end());
       }
 
       void add_ports(std::vector<std::string> const & vs) {
-        outputs.insert(outputs.end(), vs.begin(), vs.end());
+        ports.insert(ports.end(), vs.begin(), vs.end());
       }
 
-      void add_function(ast::Opcode const & op, std::vector<std::string> const & vs) {
-        functions.push_back(Function(op, vs));
+      void add_function(std::string const & op, std::vector<std::string> const & vs) {
+        functions.push_back(Function(ast::string_opcode_map[op], vs));
       }
 
     };

@@ -8,6 +8,7 @@
 #include <vector>
 #include <boost/spirit/include/support_istream_iterator.hpp>
 #include <stdio.h>
+#include <map>
 
 using namespace verilog;
 using namespace ast;
@@ -16,13 +17,9 @@ using namespace spirit;
 using namespace parser;
 
 struct verilogProperties{
-  char name[200];
+  std::string name;
   int inputs, outputs, ports, wires, functions;
-  int qtdAnd, qtdNand, qtdOr, qtdNor, qtdXor, qtdXnor, qtdNot, qtdBuf;
-
-  verilogProperties(): inputs(0), outputs(0), ports(0), wires(0), functions(0),
-    qtdAnd(0), qtdNand(0), qtdOr(0), qtdNor(0), qtdXor(0), qtdXnor(0), qtdNot(0),
-    qtdBuf(0){}
+  std::map<Opcode,int> qtd;
 };
 
 
@@ -40,7 +37,7 @@ int main(int nargs, char** argv){
     parse_verilog(v, begin, end);
    
     std::vector<std::string>::iterator is;
-    std::vector<Function>::iterator ir;
+   
     std::cout << v.ports.size() << "\n"; 
     tmp.inputs = v.inputs.size();
     tmp.outputs = v.outputs.size();
@@ -48,20 +45,11 @@ int main(int nargs, char** argv){
     tmp.wires = v.wires.size();
     tmp.functions = v.functions.size();
     
-    for(ir = v.functions.begin(); ir != v.functions.end(); ir++){
-      if(ir->op == "and") tmp.qtdAnd++;
-      else if(ir->op == "nand") tmp.qtdNand++;
-      else if(ir->op == "or") tmp.qtdOr++;
-      else if(ir->op == "nor") tmp.qtdNor++;
-      else if(ir->op == "xor") tmp.qtdXor++;
-      else if(ir->op == "xnor") tmp.qtdXnor++;
-      else if(ir->op == "not") tmp.qtdNot++;
-      else if(ir->op == "buf") tmp.qtdBuf++;
-    }
-    
+    for(auto ir : v.functions) tmp.qtd[ir.op]++;
+  
     for(j = strlen(argv[i]); argv[i][j] != '/'; j--);
-    strcpy(tmp.name,&argv[i][j+1]);
-    
+    tmp.name = argv[i];
+    tmp.name = tmp.name.substr(j+1);
     verilogFinal.push_back(tmp);
   }
   
@@ -71,21 +59,21 @@ int main(int nargs, char** argv){
     fputs("##BENCHMARK'S TABLE\n",pFile);
     fputs("|TEST|GATES|INPUTS|OUTPUTS|FUNCTION|AND|NAND|OR|NOR|XOR|XNOR|NOT|BUF|\n",pFile);
     fputs("|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n",pFile);
-    std::vector<verilogProperties>::iterator iv;
     
-    for(iv = verilogFinal.begin(); iv != verilogFinal.end(); iv++){
-      fprintf(pFile,"|%s|",iv->name);
-      fprintf(pFile,"%d|",iv->ports);
-      fprintf(pFile,"%d|",iv->inputs);
-      fprintf(pFile,"%d|",iv->outputs);
-      fprintf(pFile,"%d|",iv->functions);
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdAnd,((100.0/iv->functions)*iv->qtdAnd));
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdNand,((iv->functions/100.0)*iv->qtdNand));
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdOr,((iv->functions/100.0)*iv->qtdOr));
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdNor,((iv->functions/100.0)*iv->qtdNor));
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdXor,((iv->functions/100.0)*iv->qtdXor));
-      fprintf(pFile,"%d(%.1lf%%)|",iv->qtdNot,((iv->functions/100.0)*iv->qtdNot));
-      fprintf(pFile,"%d(%.1lf%%)|\n",iv->qtdBuf,((iv->functions/100.0)*iv->qtdBuf));
+    for(auto iv : verilogFinal){
+      fprintf(pFile,"|%s|",iv.name.c_str());
+      fprintf(pFile,"%d|",iv.ports);
+      fprintf(pFile,"%d|",iv.inputs);
+      fprintf(pFile,"%d|",iv.outputs);
+      fprintf(pFile,"%d|",iv.functions);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::And],(iv.qtd[Opcode::And]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Nand],(iv.qtd[Opcode::Nand]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Or],(iv.qtd[Opcode::Or]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Nor],(iv.qtd[Opcode::Nor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Xor],(iv.qtd[Opcode::Xor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Xnor],(iv.qtd[Opcode::Xnor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Not],(iv.qtd[Opcode::Not]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.1lf%%)|\n",iv.qtd[Opcode::Buf],(iv.qtd[Opcode::Buf]/(double)iv.functions)*100.0);
     }
   
     fclose(pFile);

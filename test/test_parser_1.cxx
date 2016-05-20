@@ -38,7 +38,6 @@ int main(int nargs, char** argv){
    
     std::vector<std::string>::iterator is;
    
-    std::cout << v.ports.size() << "\n"; 
     tmp.inputs = v.inputs.size();
     tmp.outputs = v.outputs.size();
     tmp.ports = v.ports.size();
@@ -48,13 +47,14 @@ int main(int nargs, char** argv){
     for(auto ir : v.functions) tmp.qtd[ir.op]++;
   
     for(j = strlen(argv[i]); argv[i][j] != '/'; j--);
+    
     tmp.name = argv[i];
     tmp.name = tmp.name.substr(j+1);
     verilogFinal.push_back(tmp);
   }
   
   FILE * pFile;
-  pFile = fopen("benchmarksTable.markdown","w");
+  pFile = fopen("../benchmarksTable.markdown","w");
   if(pFile != NULL){
     fputs("##BENCHMARK'S TABLE\n",pFile);
     fputs("|TEST|GATES|INPUTS|OUTPUTS|FUNCTION|AND|NAND|OR|NOR|XOR|XNOR|NOT|BUF|\n",pFile);
@@ -66,14 +66,14 @@ int main(int nargs, char** argv){
       fprintf(pFile,"%d|",iv.inputs);
       fprintf(pFile,"%d|",iv.outputs);
       fprintf(pFile,"%d|",iv.functions);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::And],(iv.qtd[Opcode::And]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Nand],(iv.qtd[Opcode::Nand]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Or],(iv.qtd[Opcode::Or]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Nor],(iv.qtd[Opcode::Nor]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Xor],(iv.qtd[Opcode::Xor]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Xnor],(iv.qtd[Opcode::Xnor]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|",iv.qtd[Opcode::Not],(iv.qtd[Opcode::Not]/(double)iv.functions)*100.0);
-      fprintf(pFile,"%d(%.1lf%%)|\n",iv.qtd[Opcode::Buf],(iv.qtd[Opcode::Buf]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::And],(iv.qtd[Opcode::And]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Nand],(iv.qtd[Opcode::Nand]/(double)iv.functions)*100);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Or],(iv.qtd[Opcode::Or]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Nor],(iv.qtd[Opcode::Nor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Xor],(iv.qtd[Opcode::Xor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Xnor],(iv.qtd[Opcode::Xnor]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|",iv.qtd[Opcode::Not],(iv.qtd[Opcode::Not]/(double)iv.functions)*100.0);
+      fprintf(pFile,"%d(%.2lf%%)|\n",iv.qtd[Opcode::Buf],(iv.qtd[Opcode::Buf]/(double)iv.functions)*100.0);
     }
   
     fclose(pFile);

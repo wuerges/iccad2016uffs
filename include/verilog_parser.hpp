@@ -6,10 +6,12 @@
 #include <boost/config/warning_disable.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/include/support_istream_iterator.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 namespace verilog {
 
@@ -109,6 +111,16 @@ namespace parser
 
       return 0;
     }
+
+    int parse_verilog_file(verilog::ast::Verilog &v, char* filename) {
+      std::ifstream input(filename);
+      input.unsetf(std::ios::skipws);
+      boost::spirit::istream_iterator begin(input);
+      boost::spirit::istream_iterator end;
+      return parse_verilog(v, begin, end);
+    }
+
+
 
 }
 

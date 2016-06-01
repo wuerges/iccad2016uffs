@@ -6,6 +6,12 @@ IF (Boost_FOUND)
 ENDIF()
 
 add_executable(TestParser_fields.x test_parser_fields.cxx)
+add_executable(iccad2016solve.x iccad2016solve.cxx)
+
+target_link_libraries(iccad2016solve.x
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+)
 
 target_link_libraries(TestParser_fields.x 
   ${Boost_FILESYSTEM_LIBRARY}

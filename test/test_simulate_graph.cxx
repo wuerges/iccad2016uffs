@@ -2,6 +2,7 @@
 #include <inputs_generator.hpp>
 #include <verilog_parser.hpp>
 #include <graph_simulator.hpp>
+#include <verilog_simulator.hpp>
 #include <verilog_graph_adapter.hpp>
 
 #include <iostream>
@@ -22,14 +23,17 @@ int main(int nargs, char** argv){
   convert(v, g);
 
 
-  std::vector<bool> input, output;
+  std::vector<bool> input, output1, output2;
   Generator gen;
   gen.generate_inputs(input, v.inputs.size());
 
 
-  simulate(input, output, g);
+  simulate(input, output1, g);
+  simulate(input, output2, v);
 
-  
-  return 0;
+  if (output1 == output2)
+    return 0;
+  else 
+    return -1;
 
 }

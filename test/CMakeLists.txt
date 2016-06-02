@@ -29,7 +29,6 @@ target_link_libraries(TestConvert1.x
 
 
 # Novos testes devem ser adicionados aqui 
-add_test(check_if_simulator_runs TestSimulateGraph.x ../testcases/BDD/in_1.v)
 
 add_test(check_if_spirit_runs TestSpirit1.x)
 add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)
@@ -105,7 +104,8 @@ FOREACH(i ./testcases/unit15/in_1.v
 ./testcases/unit17/in_1.v
 ./testcases/unit17/in_2.v
 )
-	add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
+  add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
+  # add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
 ENDFOREACH()
 
 

@@ -22,10 +22,11 @@ namespace verilog
       boost::setS, 
       boost::vecS, 
       boost::bidirectionalS, 
-      boost::no_property, NegP> GD;
+      bool, NegP> GD;
 
     struct G {
       std::map<const std::string, int> name_map;
+      std::vector<std::string> inputs, outputs;
 
       GD graph;
 

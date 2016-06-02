@@ -33,21 +33,30 @@ namespace verilog
         int v = new_vertex();
         name_map[name] = v;
         return v;
-      };
+      }
+
+
+      std::string new_named_vertex() {
+        int v = new_vertex();
+        std::stringstream ss;
+        ss << "extra_vertex_" << v;
+        name_map[ss.str()] = v;
+        return ss.str();
+      }
 
       int new_vertex() {
         return boost::add_vertex(graph);
-      };
-
+      }
+  
       int get_vertex(std::string name) {
         auto it = name_map.find(name);
-        if (it != name_map.end())
+        if (it != name_map.end()) {
           return it->second;
-
-        std::stringstream ss;
-        ss << "Name not found: " << name;
-        throw std::invalid_argument(ss.str());
-      };
+        }
+        else {
+          return add_vertex(name);
+        }
+      }
 
       void add_edge(std::string name1, std::string name2, NegP p) {
         int v1 = get_vertex(name1);

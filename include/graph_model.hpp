@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdexcept>
 #include <map>
+#include <sstream>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -32,18 +33,30 @@ namespace verilog
         int v = new_vertex();
         name_map[name] = v;
         return v;
-      };
+      }
+
+
+      std::string new_named_vertex() {
+        int v = new_vertex();
+        std::stringstream ss;
+        ss << "extra_vertex_" << v;
+        name_map[ss.str()] = v;
+        return ss.str();
+      }
 
       int new_vertex() {
         return boost::add_vertex(graph);
-      };
-
+      }
+  
       int get_vertex(std::string name) {
         auto it = name_map.find(name);
-        if (it != name_map.end())
+        if (it != name_map.end()) {
           return it->second;
-        throw std::invalid_argument("name not found");
-      };
+        }
+        else {
+          return add_vertex(name);
+        }
+      }
 
       void add_edge(std::string name1, std::string name2, NegP p) {
         int v1 = get_vertex(name1);

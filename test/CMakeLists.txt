@@ -29,10 +29,10 @@ target_link_libraries(TestConvert1.x
 
 
 # Novos testes devem ser adicionados aqui 
-add_test(check_if_simulator_runs TestSimulateGraph.x ./testcases/BDD/in_1.v)
+add_test(check_if_simulator_runs TestSimulateGraph.x ../testcases/BDD/in_1.v)
 
 add_test(check_if_spirit_runs TestSpirit1.x)
-add_test(check_if_converter_runs TestConvert1.x ./testcases/BDD/in_1.v)
+add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)
 
 
 # Novos testes devem ser adicionados aqui 

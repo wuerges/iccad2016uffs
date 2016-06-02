@@ -4,6 +4,7 @@
 #include <verilog_model.hpp>
 #include <graph_model.hpp>
 #include <sstream>
+#include <algorithm>
 #include <map>
 #include <stdexcept>
 
@@ -165,6 +166,11 @@ namespace verilog {
   }
 
   void convert(ast::Verilog & v, graph::G &g) {
+
+    g.inputs = v.inputs;
+    std::sort(g.inputs.begin(), g.inputs.end());
+    g.outputs = v.outputs;
+    std::sort(g.outputs.begin(), g.outputs.end());
 
     for(auto w : v.outputs)
       g.add_vertex(w);

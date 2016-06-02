@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdexcept>
 #include <map>
+#include <sstream>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -42,7 +43,10 @@ namespace verilog
         auto it = name_map.find(name);
         if (it != name_map.end())
           return it->second;
-        throw std::invalid_argument("name not found");
+
+        std::stringstream ss;
+        ss << "Name not found: " << name;
+        throw std::invalid_argument(ss.str());
       };
 
       void add_edge(std::string name1, std::string name2, NegP p) {

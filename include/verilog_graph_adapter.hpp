@@ -28,6 +28,27 @@ namespace verilog {
     }
   }
 
+  void add_function_xnor(std::string i1, std::string i2, std::string o, graph::G & g) {
+    std::string t1 = g.new_named_vertex();
+    std::string t2 = g.new_named_vertex();
+    std::string t3 = g.new_named_vertex();
+    std::string t4 = g.new_named_vertex();
+
+    g.add_edge(i1, t1, graph::NegP::Positive);
+    g.add_edge(i2, t1, graph::NegP::Positive);
+
+    g.add_edge(i1, t2, graph::NegP::Positive);
+    g.add_edge(t1, t2, graph::NegP::Negative);
+
+    g.add_edge(i2, t3, graph::NegP::Positive);
+    g.add_edge(t1, t3, graph::NegP::Negative);
+
+    g.add_edge(t2, t4, graph::NegP::Negative);
+    g.add_edge(t3, t4, graph::NegP::Negative);
+
+    g.add_edge(t4, o, graph::NegP::Positive);
+  }
+
   void add_function_xor(std::string i1, std::string i2, std::string o, graph::G & g) {
     std::string t1 = g.new_named_vertex();
     std::string t2 = g.new_named_vertex();
@@ -47,6 +68,28 @@ namespace verilog {
     g.add_edge(t3, t4, graph::NegP::Negative);
 
     g.add_edge(t4, o, graph::NegP::Negative);
+  }
+
+  void add_function_xnor(std::vector<std::string> & is, 
+      std::string o, graph::G & g) {
+    if (is.size() < 2) {
+      throw std::invalid_argument("Input size is smaller than 2");
+    }
+    else if (is.size() == 2) {
+      add_function_xnor(is.front(), is.back(), o, g);
+    }
+    else {
+      std::string i1 = is.back();
+      is.pop_back();
+      std::string i2 = is.back();
+      is.pop_back();
+
+      std::string extra = g.new_named_vertex();
+      add_function_xnor(i1, i2, extra, g);
+
+      is.push_back(extra);
+      add_function_xnor(is, o, g);
+    }
   }
 
   void add_function_xor(std::vector<std::string> & is, 
@@ -75,6 +118,12 @@ namespace verilog {
     std::vector<std::string> is(++f.parameters.begin(), f.parameters.end());
     
     add_function_xor(is, f.parameters.front(), g);
+  }
+
+  void add_function_xnor(ast::Function & f, graph::G & g) {
+    std::vector<std::string> is(++f.parameters.begin(), f.parameters.end());
+    
+    add_function_xnor(is, f.parameters.front(), g);
   }
 
   // 
@@ -142,6 +191,9 @@ namespace verilog {
           break;
         case ast::Opcode::Xor: 
           add_function_xor(f, g);
+          break;
+        case ast::Opcode::Xnor: 
+          add_function_xnor(f, g);
           break;
         case ast::Opcode::And: 
           add_function_and(f, g);

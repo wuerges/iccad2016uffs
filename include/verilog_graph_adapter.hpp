@@ -14,7 +14,7 @@ namespace verilog {
   void add_function_not(ast::Function & f, graph::G & g) {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
-        it != f.parameters.end();  ++it) {
+        it != --f.parameters.end();  ++it) {
       g.add_edge(orig, *it, graph::NegP::Negative);
     }
   }
@@ -23,7 +23,7 @@ namespace verilog {
   void add_function_buf(ast::Function & f, graph::G & g) {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
-        it != f.parameters.end();  ++it) {
+        it != --f.parameters.end();  ++it) {
       g.add_edge(orig, *it, graph::NegP::Positive);
     }
   }
@@ -131,7 +131,7 @@ namespace verilog {
     std::string dest;
     if (np_out == graph::NegP::Negative) { 
       dest = g.new_named_vertex();
-      g.add_edge(f.parameters.front(), dest, graph::NegP::Negative);
+      g.add_edge(dest, f.parameters.front(), graph::NegP::Negative);
     }
     else {
       dest = f.parameters.front();

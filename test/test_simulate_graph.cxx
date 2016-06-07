@@ -30,7 +30,7 @@ int main(int nargs, char** argv){
 
   simulate(input, output1, g);
   simulate(input, output2, v);
-
+  
   if (output1 == output2)
     return 0;
   else 

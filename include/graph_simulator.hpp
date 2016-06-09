@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <deque>
+#include <sstream>
+#include <stdexcept>
 #include <iterator>
 
 // #include <boost/graph/graphviz.hpp>
@@ -14,13 +16,43 @@ namespace verilog {
   namespace graph {
 
 
-    bool propagate(bool b, graph::NegP np) {
-      if (np == graph::NegP::Positive) {
-        return b;
+    LogicValue negate(LogicValue v) {
+      return (v == LogicValue::True) ? LogicValue::False : LogicValue::True;
+    }
+
+    void checkValid(LogicValue v) {
+      switch(v) {
+        case LogicValue::True:
+        case LogicValue::False:
+          return;
+        default:
+          std::stringstream ss;
+          ss << "Error: Logic value <>";
+          throw std::invalid_argument(ss.str());
       }
-      else {
-        return !b;
-      }
+    }
+
+    LogicValue propagate(LogicValue v, graph::NegP np) {
+      checkValid(v);
+
+      return np == NegP::Positive ? v : negate(v);
+    }
+
+    LogicValue lv_and(LogicValue v1, LogicValue v2) {
+      checkValid(v1);
+      checkValid(v2);
+      if (v1 == LogicValue::False)
+        return v1;
+      return v2;
+    }
+
+    LogicValue initValue(bool b) {
+      return b ? LogicValue::True : LogicValue::False;
+    }
+
+    bool toBool(LogicValue v) {
+      checkValid(v);
+      return v == LogicValue::True;
     }
 
     void simulate(std::vector<bool> & inputs, std::vector<bool> & outputs, G & g) {
@@ -34,8 +66,11 @@ namespace verilog {
 
       // Initialize the inputs
       for (int i = 0; i < g.inputs.size(); ++ i) {
-        g.graph[g.name_map[g.inputs[i]]] = inputs[i];
+        g.graph[g.name_map[g.inputs[i]]] = initValue(inputs[i]);
       }
+      // Initialize the constants 
+      g.graph[g.name_map["1'b0"]] = LogicValue::False;
+      g.graph[g.name_map["1'b1"]] = LogicValue::True;
 
       // Propagate the values to the outputs
       for (int node : topo_order) {
@@ -50,9 +85,9 @@ namespace verilog {
 
           for (auto e = ++p.first; e != p.second; ++e) {
             int t = target(*e, g.graph);
-            bool value = propagate(g.graph[node], g.graph[*e]);
+            LogicValue value = propagate(g.graph[node], g.graph[*e]);
 
-            g.graph[t] &= value;
+            g.graph[t] = lv_and(g.graph[t], value);
           }
 
         }
@@ -60,7 +95,7 @@ namespace verilog {
 
       // output the outputs!
       for(std::string n : g.outputs) {
-        outputs.push_back(g.graph[g.name_map[n]]);
+        outputs.push_back(toBool(g.graph[g.name_map[n]]));
       }
     }
   }

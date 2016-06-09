@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <data_model.hpp>
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,9 +16,6 @@
 namespace verilog 
 {
   namespace graph {
-    enum class LogicValue { 
-      Zero, True, False, Invalid
-    };
 
     enum class NegP { 
       Positive, Negative   

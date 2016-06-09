@@ -172,6 +172,9 @@ namespace verilog {
     g.outputs = v.outputs;
     std::sort(g.outputs.begin(), g.outputs.end());
 
+    g.add_vertex("1'b0");
+    g.add_vertex("1'b1");
+
     for(auto w : v.outputs)
       g.add_vertex(w);
 

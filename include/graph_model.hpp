@@ -14,6 +14,10 @@
 namespace verilog 
 {
   namespace graph {
+    enum class LogicValue { 
+      Zero, True, False, Invalid
+    };
+
     enum class NegP { 
       Positive, Negative   
     };
@@ -22,7 +26,7 @@ namespace verilog
       boost::setS, 
       boost::vecS, 
       boost::bidirectionalS, 
-      bool, NegP> GD;
+      LogicValue, NegP> GD;
 
     struct G {
       std::map<const std::string, int> name_map;

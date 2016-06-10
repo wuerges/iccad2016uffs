@@ -110,8 +110,8 @@ FOREACH(i ./testcases/unit15/in_1.v
 ./testcases/unit17/in_1.v
 ./testcases/unit17/in_2.v
 )
-  add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
-  # add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
+  #add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
+  add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
 ENDFOREACH()
 
 

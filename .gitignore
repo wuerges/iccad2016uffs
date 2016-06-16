@@ -8,8 +8,4 @@ DartConfiguration.tcl
 CTestTestfile.cmake
 test/Testing
 *.x
-s.v
-saidaIcarus
-*a.out
-*s.out
-
+*.a

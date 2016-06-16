@@ -25,9 +25,9 @@ namespace verilog {
 
 
     void simulate(std::vector<bool> & inputs, std::vector<bool> & outputs, G & g) {
-
+		
       using namespace boost;
-
+	  
       std::deque<int> topo_order;
       boost::topological_sort(g.graph, std::front_inserter(topo_order));
       //

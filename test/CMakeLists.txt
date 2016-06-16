@@ -12,6 +12,7 @@ add_executable(TestParser1.x test_parser_1.cxx)
 add_executable(TestSimulateGraph.x test_simulate_graph.cxx)
 add_executable(TestSimulateIcarus.x test_simulate_icarus.cxx)
 add_executable(TestConvert1.x converts_a_verilog_to_a_graph.cxx)
+add_executable(simulation.x simulation.cxx)
 
 target_link_libraries(TestSimulateIcarus.x 
   ${Boost_FILESYSTEM_LIBRARY}
@@ -32,6 +33,12 @@ target_link_libraries(TestParser1.x
 )
 
 target_link_libraries(TestConvert1.x 
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  verilog_model
+)
+
+target_link_libraries(simulation.x 
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   verilog_model
@@ -114,8 +121,8 @@ FOREACH(i ./testcases/unit15/in_1.v
 ./testcases/unit17/in_1.v
 ./testcases/unit17/in_2.v
 )
-  #add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
-  add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
+  add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
+  #add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
 ENDFOREACH()
 
 

@@ -15,7 +15,7 @@ namespace verilog
 
     extern std::map<Opcode, std::string> opcode_string_map;
     extern std::map<std::string, Opcode> string_opcode_map;
-    extern std::ostream& operator<< (std::ostream& stream, const Opcode& op);
+    std::ostream& operator<< (std::ostream& stream, const Opcode& op);
 
     struct Function {
       Opcode op;

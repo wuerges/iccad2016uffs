@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <iterator>
 
-// #include <boost/graph/graphviz.hpp>
+#include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
 
@@ -34,30 +34,30 @@ namespace verilog {
       //boost::write_graphviz(std::cout, g.graph);
 
       // Initialize the inputs
+
       for (int i = 0; i < g.inputs.size(); ++ i) {
         g.graph[g.name_map[g.inputs[i]]] = fromBool(inputs[i]);
       }
+
       // Initialize the constants 
       g.graph[g.name_map["1'b0"]] = LogicValue::False;
       g.graph[g.name_map["1'b1"]] = LogicValue::True;
 
       // Propagate the values to the outputs
       for (int node : topo_order) {
-        if(out_degree(node, g.graph) > 0) {
-          auto p = out_edges(node, g.graph);
+        if(in_degree(node, g.graph) > 0) {
+          auto p = in_edges(node, g.graph);
 
-          // First target
-          auto e1 = *p.first;
-          int t1 = target(e1, g.graph);
+          LogicValue sum = LogicValue::True;
 
-          g.graph[t1] = propagate(g.graph[node], g.graph[e1]);
+          for (auto e = p.first; e != p.second; ++e) {
 
-          for (auto e = ++p.first; e != p.second; ++e) {
-            int t = target(*e, g.graph);
-            LogicValue value = propagate(g.graph[node], g.graph[*e]);
+            int s = source(*e, g.graph);
+            LogicValue value = propagate(g.graph[s], g.graph[*e]);
 
-            g.graph[t] = g.graph[t] && value; // lv_and(g.graph[t], value);
+            sum = sum && value;
           }
+          g.graph[node] = sum;
 
         }
       }

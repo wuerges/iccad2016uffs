@@ -11,6 +11,7 @@ add_executable(TestSpirit1.x test_spirit_1.cxx)
 add_executable(TestParser1.x test_parser_1.cxx)
 add_executable(TestSimulateGraph.x test_simulate_graph.cxx)
 add_executable(TestConvert1.x converts_a_verilog_to_a_graph.cxx)
+add_executable(simulation.x simulation.cxx)
 
 target_link_libraries(TestSimulateGraph.x 
   ${Boost_FILESYSTEM_LIBRARY}
@@ -23,6 +24,11 @@ target_link_libraries(TestParser1.x
 )
 
 target_link_libraries(TestConvert1.x 
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+)
+
+target_link_libraries(simulation.x 
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )

@@ -41,6 +41,7 @@ target_link_libraries(TestConvert1.x
 target_link_libraries(simulation.x 
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
+  verilog_model
 )
 
 

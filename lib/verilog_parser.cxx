@@ -95,7 +95,7 @@ namespace parser
 	
 	  auto cpp_style_comment = "//" > *(~char_('\n')) > char_('\n');
 	  auto rest_of_cpp_comment = *(~char_('\n')) > char_('\n');
-	  auto rest_of_c_comment = *(~char_('*') > ~char_('/')) > "*/";
+	  auto rest_of_c_comment = *(char_ - "*/") > "*/";
 	  
 	  auto comment = +space | (char_('/') >> ((char_('/') >> rest_of_cpp_comment) | (char_('*') > rest_of_c_comment)));
 

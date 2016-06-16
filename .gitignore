@@ -8,3 +8,4 @@ DartConfiguration.tcl
 CTestTestfile.cmake
 test/Testing
 *.x
+*.a

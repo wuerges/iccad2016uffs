@@ -5,16 +5,20 @@ IF (Boost_FOUND)
   ADD_DEFINITIONS( "-DHAS_BOOST" )
 ENDIF()
 
+add_library(verilog_parser ../lib/verilog_parser.cxx ../lib/verilog_model.cxx)
+
 add_executable(TestParser_fields.x test_parser_fields.cxx)
 add_executable(iccad2016solve.x iccad2016solve.cxx)
 
 target_link_libraries(iccad2016solve.x
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
+  verilog_parser
 )
 
 target_link_libraries(TestParser_fields.x 
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
+  verilog_parser
 )
 

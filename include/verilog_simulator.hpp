@@ -177,6 +177,10 @@ namespace verilog {
       booleanTest(indexNodes,nodes);
 
       i = 0;
+
+
+
+
       for(auto it : v.outputs)
         outputs.push_back(nodes[indexNodes[it]].value);
     }

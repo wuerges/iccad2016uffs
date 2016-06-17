@@ -168,9 +168,9 @@ namespace verilog {
   void convert(ast::Verilog & v, graph::G &g) {
 
     g.inputs = v.inputs;
-    std::sort(g.inputs.begin(), g.inputs.end());
+    //std::sort(g.inputs.begin(), g.inputs.end());
     g.outputs = v.outputs;
-    std::sort(g.outputs.begin(), g.outputs.end());
+    //std::sort(g.outputs.begin(), g.outputs.end());
 
     g.add_vertex("1'b0");
     g.add_vertex("1'b1");

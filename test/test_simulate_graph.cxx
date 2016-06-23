@@ -10,8 +10,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <chrono>
 
 using namespace verilog;
+using namespace std::chrono;
 
 int main(int nargs, char** argv){
   
@@ -28,8 +30,16 @@ int main(int nargs, char** argv){
   gen.generate_inputs(input, v.inputs.size());
 
 
+
+  steady_clock::time_point t1 = steady_clock::now();
   simulate(input, output1, g);
-  //simulate(input, output2, v);
+  steady_clock::time_point t2 = steady_clock::now();
+  simulate(input, output2, v);
+  steady_clock::time_point t3 = steady_clock::now();
+
+
+  std::cout << "nand    Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " microseconds." << std::endl;
+  std::cout << "Netlist Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() << " microseconds." << std::endl;
   
   if (output1 == output2)
     return 0;

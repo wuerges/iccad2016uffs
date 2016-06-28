@@ -16,6 +16,30 @@ namespace solution {
       map<string, vector<pair<string, bool> > > inputs; 
       map<string, vector<pair<string, bool> > > outputs; 
       vector<string> zeroes;
+
+      friend ostream & operator<<(ostream & o, const Match & m) {
+        o << "Match: { " << endl;
+        for (auto ip : m.inputs) {
+          o << "  Input: " << ip.first << " -> ";
+          for (auto c2 : ip.second) {
+            o << "(" << c2.first << ", " <<c2.second << ") ";
+          }
+          o << ";" << endl;
+        }
+        for (auto ip : m.outputs) {
+          o << "  Output: " << ip.first << " -> ";
+          for (auto c2 : ip.second) {
+            o << "(" << c2.first << ", " <<c2.second << ") ";
+          }
+          o << ";" << endl;
+        }
+        o << "  Zero: ";
+        for (auto z : m.zeroes) {
+          o << z << " ";
+        }
+        o << "; " << endl << "}" << endl;
+        return o;
+      }
   };
 
 
@@ -86,8 +110,6 @@ namespace solution {
     a.resize(a.size() / 2);
     b.resize(b.size() / 2);
 
-    cout << "a.size(): " << a.size() << endl;
-    cout << "b.size(): " << b.size() << endl;
 
     vector<vector<Count> > g;
     group_counts(b, g, b.size() - a.size());
@@ -96,7 +118,7 @@ namespace solution {
       stringstream ss;
       ss << "Groups should have the same size now:"
         << " Circuit 1: " << a.size() 
-        << " Circuit 2:" << b.size() << endl;
+        << " Circuit 2:" << g.size() << endl;
       throw std::invalid_argument(ss.str());
     }
 

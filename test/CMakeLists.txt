@@ -15,33 +15,33 @@ add_executable(TestConvert1.x converts_a_verilog_to_a_graph.cxx)
 add_executable(simulation.x simulation.cxx)
 
 target_link_libraries(TestSimulateIcarus.x 
+  verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_model
 )
 
 target_link_libraries(TestSimulateGraph.x 
+  verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_model
 )
 
 target_link_libraries(TestParser1.x 
+  verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_model
 )
 
 target_link_libraries(TestConvert1.x 
+  verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_model
 )
 
 target_link_libraries(simulation.x 
+  verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_model
 )
 
 

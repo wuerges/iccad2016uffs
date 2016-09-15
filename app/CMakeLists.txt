@@ -11,14 +11,14 @@ add_executable(TestParser_fields.x test_parser_fields.cxx)
 add_executable(iccad2016solve.x iccad2016solve.cxx)
 
 target_link_libraries(iccad2016solve.x
+  verilog_parser
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_parser
 )
 
 target_link_libraries(TestParser_fields.x 
+  verilog_parser
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  verilog_parser
 )
 

@@ -23,10 +23,10 @@ int main(int nargs, char** argv){
   //parser::parse_verilog_file(v, argv[1]);
 
 
-  bdd::G g;
-  int e1 = g.add_elementar_node("a");
-  int e2 = g.add_elementar_node("b");
-  int e3 = g.add_elementar_node("a");
+  bdd::BDD a("a");
+  bdd::BDD b("b");
+  bdd::BDD c("c");
+  bdd::BDD d("d");
 /*
   convert(v, g);
 

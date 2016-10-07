@@ -130,6 +130,7 @@ namespace verilog
       }
 
       /** 
+       * USE WITH CAUTION, as it changes the current BDD
        * merges the input edges of the node b into node a.
        */
       void merge_input_edges(int a, int b) {

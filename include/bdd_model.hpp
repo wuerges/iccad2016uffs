@@ -79,19 +79,14 @@ namespace verilog
         int old_zero = node_map[b.zero];
         int old_one  = node_map[b.one];
 
+
         // copies the old one edges into the new graph
-        auto one_edges = in_edges(old_one, c.graph);
-        for (auto e = one_edges.first; e != one_edges.second; ++e) {
-            int s = boost::source(*e, c.graph);
-            c.add_edge(s, c.one, c.graph[*e]); 
-        }
+        c.merge_input_edges(c.one, old_one);
+        boost::remove_vertex(old_one, c.graph);
 
         // copies the old zero edges into the new graph
-        auto zero_edges = in_edges(old_zero, c.graph);
-        for (auto e = zero_edges.first; e != zero_edges.second; ++e) {
-            int s = boost::source(*e, c.graph);
-            c.add_edge(s, c.zero, c.graph[*e]); 
-        }
+        c.merge_input_edges(c.zero, old_zero);
+        boost::remove_vertex(old_zero, c.graph);
 
         c.source = c.conjunction_internal(c.source, node_map[c.source]);
         return c;
@@ -134,6 +129,20 @@ namespace verilog
         graph[one].t  = Type::One;
       }
 
+      /** 
+       * merges the input edges of the node b into node a.
+       */
+      void merge_input_edges(int a, int b) {
+        auto one_edges = in_edges(b, graph);
+        for (auto e = one_edges.first; e != one_edges.second; ++e) {
+            int s = boost::source(*e, graph);
+            add_edge(s, a, graph[*e]); 
+        }
+      }
+
+      std::map<int, std::vector<int> > find_layers() {
+        // TODO
+      }
      
       // Criar um hash o mais unico possivel para um bdd
       hashcode hash(int v) {

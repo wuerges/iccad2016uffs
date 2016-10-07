@@ -1,3 +1,5 @@
+//A funcao "addFunctionsTypeNodes" eh a funcao que esta tomando mais tempo de execucao, isto esta ocorrendo pelo fato de que a funcao, fica alocando dinamicamente os parametros do ADJ. Porem dah forma como a simulacao funciona atualmente, nao tem muito como fugir deste problema. Uma solucao viavel seria a implementacao de uma nova funcao de simulacao, totalmente repensada, nao sendo mais necessario fazer uma toposort+bfs, como estava sendo feito. A ideia desta simulacao seria montar o grafo ao contrario, e chamar, e fazer a simulacao tbm ao contrario, porem da forma bottom-up, sendo assim, a simulacao nao seria mais chamada a partir das entradas, e sim da saida.
+//A funcionamento da nova simulacao seria, dependo de cada tipo de porta, chamar uma recursao que faria a mesma coisa para todos os seus parametros, e assim que a recursao voltar, teria o valor da porta calculado.
 #include <verilog_parser.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/home/x3.hpp>
@@ -15,7 +17,7 @@ using namespace spirit;
 using namespace parser;
 
 struct node{
-  int type, dIn, bkpDin;
+  int type, dIn;
   bool value;
   Opcode typeFunction;
   std::vector<int> adj;
@@ -24,7 +26,7 @@ struct node{
 node createNewNode(std::string is, int type, int &totalNodes,std::map<std::string,int> &indexNodes){
   node tmp;
   indexNodes[is] = totalNodes++;
-  tmp.dIn  = tmp.bkpDin = 0;
+  tmp.dIn = 0;
   tmp.type = type;
   tmp.typeFunction = Opcode::Buf;
   tmp.value = false;
@@ -55,7 +57,7 @@ void addFunctionsTypeNodes(std::map<std::string,int> &indexNodes, std::vector<no
       int j = (int)it.parameters.size();
       
       tmp.typeFunction = it.op;
-      tmp.value = tmp.dIn = tmp.bkpDin = tmp.type = 1;
+      tmp.value = tmp.dIn = tmp.type = 1;
       nodes[indexNodes[it.parameters[j-1]]].adj.push_back(totalNodes);
       
       for(int i = 0; i < (j-1); i++){
@@ -66,15 +68,15 @@ void addFunctionsTypeNodes(std::map<std::string,int> &indexNodes, std::vector<no
       totalNodes++;
     }
     else{
-      int index = indexNodes[it.parameters[0]];
+      int index = indexNodes[it.parameters[0]], i = 0;
       nodes[index].type = 1;
       nodes[index].typeFunction = it.op;
       nodes[index].value = (it.op == Opcode::And || it.op == Opcode::Nand);
-      
+        
       for(auto iv: it.parameters){
 	if(it.parameters[0] != iv){	  
 	  nodes[indexNodes[iv]].adj.push_back(index);
-	  nodes[index].dIn = ++nodes[index].bkpDin;   
+	  nodes[index].dIn++;   
 	}
       }
     }

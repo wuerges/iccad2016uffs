@@ -14,19 +14,33 @@
 #include <map>
 #include <chrono>
 
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
 using namespace verilog;
 using namespace std::chrono;
 
 int main(int nargs, char** argv){
   
-  //ast::Verilog v;
-  //parser::parse_verilog_file(v, argv[1]);
-
-
   bdd::BDD a("a");
   bdd::BDD b("b");
   bdd::BDD c("c");
   bdd::BDD d("d");
+
+  /**
+   * tests if number of nodes of a, d, c and d are equal
+   */
+
+  if (a.size() != 3)
+    return -1;
+  if (b.size() != 3)
+    return -1;
+  if (c.size() != 3)
+    return -1;
+  if (d.size() != 3)
+    return -1;
+
+
 /*
   convert(v, g);
 

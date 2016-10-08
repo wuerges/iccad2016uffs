@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <map>
 #include <sstream>
+#include <boost/tuple/tuple.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
@@ -134,8 +135,8 @@ namespace verilog
        * merges the input edges of the node b into node a.
        */
       void merge_input_edges(int a, int b) {
-        auto one_edges = in_edges(b, graph);
-        for (auto e = one_edges.first; e != one_edges.second; ++e) {
+        GD::in_edge_iterator e, end;
+        for (boost::tie(e, end) = in_edges(b, graph); e != end; ++e) {
             int s = boost::source(*e, graph);
             add_edge(s, a, graph[*e]); 
         }
@@ -161,6 +162,15 @@ namespace verilog
        */
       void minimize() {
         // TODO
+      }
+
+      public:
+      int size() {
+        int i = 0;
+        GD::vertex_iterator n, e;
+        for(boost::tie(n, e) = boost::vertices(graph); 
+            n != e; ++n) ++i;
+        return i;
       }
     };
   }

@@ -62,7 +62,7 @@ namespace verilog
         source = add_vertex(name);
 
         add_edge(source, one, NegP::Positive);
-        add_edge(source, zero, NegP::Positive);
+        add_edge(source, zero, NegP::Negative);
 
         graph[zero].t = Type::Zero;
         graph[one].t  = Type::One;

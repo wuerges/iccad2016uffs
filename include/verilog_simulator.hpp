@@ -29,7 +29,7 @@ namespace verilog {
       return tmp;
     }
     
-    void addNodes(std::map<std::string,int> &indexNodes, std::vector<node> &nodes, std::vector<std::string> listNodes, int &totalNodes, int type){
+    void addNodes(std::map<std::string,int> &indexNodes, std::vector<node> &nodes, std::vector<std::string> & listNodes, int &totalNodes, int type){
       for(auto is : listNodes)
 	nodes.push_back(createNewNode(is,type,totalNodes,indexNodes));
     }

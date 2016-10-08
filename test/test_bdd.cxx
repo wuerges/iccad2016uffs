@@ -43,38 +43,36 @@ int main(int nargs, char** argv){
   }
 
   BDD c = a & b;
+  std::cout << c;
 
+
+  c.source = a.source;
   if (c.size() != 4) {
     std::cerr 
       << "BDD c should have size 4 but had size: " 
       << c.size() << "\n";
     return -3;
   }
-
-/*
-  convert(v, g);
-
-
-  std::vector<bool> input, output1, output2;
-  Generator gen;
-  gen.generate_inputs(input, v.inputs.size());
-
-
-
-  steady_clock::time_point t1 = steady_clock::now();
-  simulate(input, output1, g);
-  steady_clock::time_point t2 = steady_clock::now();
-  simulate(input, output2, v);
-  steady_clock::time_point t3 = steady_clock::now();
-
-
-  std::cout << "nand    Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " microseconds." << std::endl;
-  std::cout << "Netlist Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() << " microseconds." << std::endl;
   
-  if (output1 == output2)
-    return 0;
-  else 
-    return -1;
+  BDD d = c;
+  d.reverse();
 
-*/
+  if (c != d) {
+    std::cerr 
+      << "c == d\n";
+    return -4;
+  }
+
+  BDD e = d;
+  e.reverse();
+
+  if (e != d) {
+    std::cerr 
+      << "e != d\n";
+    return -5;
+  }
+
+  //std::cout << a << b <<c <<d <<e;
+
+  return 0;
 }

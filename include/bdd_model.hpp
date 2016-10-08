@@ -14,6 +14,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/graph/graphviz.hpp>
 
 namespace verilog 
 {
@@ -59,6 +60,10 @@ namespace verilog
         zero = boost::add_vertex(graph);
         one  = boost::add_vertex(graph);
         source = add_vertex(name);
+
+        add_edge(source, one, NegP::Positive);
+        add_edge(source, zero, NegP::Positive);
+
         graph[zero].t = Type::Zero;
         graph[one].t  = Type::One;
       }
@@ -77,17 +82,26 @@ namespace verilog
         BDD c = *this;
         copy_graph(b.graph, c.graph, boost::orig_to_copy(mapper));
 
+        std::cout << c;
+
         int old_zero = node_map[b.zero];
         int old_one  = node_map[b.one];
 
+        std::cout << "old_one " << old_one << "\n";
+        std::cout << "old_zero " << old_zero << "\n";
 
         // copies the old one edges into the new graph
         c.merge_input_edges(c.one, old_one);
+        boost::clear_vertex(old_one, c.graph);
         boost::remove_vertex(old_one, c.graph);
 
         // copies the old zero edges into the new graph
         c.merge_input_edges(c.zero, old_zero);
+        boost::clear_vertex(old_zero, c.graph);
         boost::remove_vertex(old_zero, c.graph);
+
+        std::cout << "Finalizing ===>>> \n" ;
+        std::cout << c;
 
         c.source = c.conjunction_internal(c.source, node_map[c.source]);
         return c;
@@ -121,6 +135,7 @@ namespace verilog
        * USE WITH CAUTION, as it changes the current BDD
        * - changes zero and one
        */
+      public:
       void reverse() {
         int aux = one;
         one = zero;
@@ -135,9 +150,12 @@ namespace verilog
        * merges the input edges of the node b into node a.
        */
       void merge_input_edges(int a, int b) {
+        std::cout << "merging " << b << " into " << a << "\n";
         GD::in_edge_iterator e, end;
         for (boost::tie(e, end) = in_edges(b, graph); e != end; ++e) {
             int s = boost::source(*e, graph);
+            std::cout << "found source " << s << "\n";
+            std::cout << "adding (" << s << ", " << a << ")\n";
             add_edge(s, a, graph[*e]); 
         }
       }
@@ -164,6 +182,23 @@ namespace verilog
         // TODO
       }
 
+      friend bool operator==(const BDD & bdd1, const BDD & bdd2) {
+        return 
+          (bdd1.source == bdd2.source) &&
+          (bdd1.one == bdd2.one) &&
+          (bdd1.zero == bdd2.zero);
+        // TODO &&
+        //  (bdd1.graph == bdd2.graph);
+      }
+      friend bool operator!=(const BDD & bdd1, const BDD & bdd2) {
+        return 
+          (bdd1.source != bdd2.source) &&
+          (bdd1.one != bdd2.one) &&
+          (bdd1.zero != bdd2.zero);
+        // TODO&&
+        //  (bdd1.graph != bdd2.graph);
+      }
+
       public:
       int size() {
         int i = 0;
@@ -171,6 +206,16 @@ namespace verilog
         for(boost::tie(n, e) = boost::vertices(graph); 
             n != e; ++n) ++i;
         return i;
+      }
+
+      friend std::ostream& operator<<(std::ostream &o, const BDD & b) {
+        o << "BDD{ source: " << b.source << "\n"
+          << "   , zero  : " << b.zero  << "\n"
+          << "   , one   : " << b.one   << "}\n";
+
+        boost::write_graphviz(o, b.graph);
+
+        return o;
       }
     };
   }

@@ -17,29 +17,39 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-using namespace verilog;
+using namespace verilog::bdd;
 using namespace std::chrono;
 
 int main(int nargs, char** argv){
   
-  bdd::BDD a("a");
-  bdd::BDD b("b");
-  bdd::BDD c("c");
-  bdd::BDD d("d");
+  BDD a("a");
+  BDD b("b");
 
   /**
    * tests if number of nodes of a, d, c and d are equal
    */
 
-  if (a.size() != 3)
+  if (a.size() != 3) {
+    std::cerr 
+      << "BDD a should have size 3 but had size: " 
+      << a.size() << "\n";
     return -1;
-  if (b.size() != 3)
-    return -1;
-  if (c.size() != 3)
-    return -1;
-  if (d.size() != 3)
-    return -1;
+  }
+  if (b.size() != 3) {
+    std::cerr 
+      << "BDD b should have size 3 but had size: " 
+      << b.size() << "\n";
+    return -2;
+  }
 
+  BDD c = a & b;
+
+  if (c.size() != 4) {
+    std::cerr 
+      << "BDD c should have size 4 but had size: " 
+      << c.size() << "\n";
+    return -3;
+  }
 
 /*
   convert(v, g);

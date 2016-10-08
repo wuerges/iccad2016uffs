@@ -68,13 +68,13 @@ namespace verilog
        * merges all nodes of b into the copy.
        * calls the conjunction_internal function for the copy.
        */
-      BDD conjunction(const BDD & a, const BDD & b) {
+      BDD operator&(const BDD & b) {
 
         typedef std::map<GD::vertex_descriptor, GD::vertex_descriptor> node_map_t;
         node_map_t node_map;
         boost::associative_property_map<node_map_t> mapper(node_map);
 
-        BDD c = a;
+        BDD c = *this;
         copy_graph(b.graph, c.graph, boost::orig_to_copy(mapper));
 
         int old_zero = node_map[b.zero];

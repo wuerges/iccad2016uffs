@@ -43,8 +43,6 @@ int main(int nargs, char** argv){
   }
 
   BDD c = a & b;
-  std::cout << c;
-
 
   c.source = a.source;
   if (c.size() != 4) {
@@ -72,7 +70,8 @@ int main(int nargs, char** argv){
     return -5;
   }
 
-  //std::cout << a << b <<c <<d <<e;
+
+  std::cout << c;
 
   return 0;
 }

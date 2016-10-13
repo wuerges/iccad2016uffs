@@ -1,5 +1,3 @@
-//A funcao "addFunctionsTypeNodes" eh a funcao que esta tomando mais tempo de execucao, isto esta ocorrendo pelo fato de que a funcao, fica alocando dinamicamente os parametros do ADJ. Porem dah forma como a simulacao funciona atualmente, nao tem muito como fugir deste problema. Uma solucao viavel seria a implementacao de uma nova funcao de simulacao, totalmente repensada, nao sendo mais necessario fazer uma toposort+bfs, como estava sendo feito. A ideia desta simulacao seria montar o grafo ao contrario, e chamar, e fazer a simulacao tbm ao contrario, porem da forma bottom-up, sendo assim, a simulacao nao seria mais chamada a partir das entradas, e sim da saida.
-//A funcionamento da nova simulacao seria, dependo de cada tipo de porta, chamar uma recursao que faria a mesma coisa para todos os seus parametros, e assim que a recursao voltar, teria o valor da porta calculado.
 #include <verilog_parser.hpp>
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/home/x3.hpp>
@@ -17,36 +15,32 @@ using namespace spirit;
 using namespace parser;
 
 struct node{
-  int type, dIn;
-  bool value;
-  Opcode typeFunction;
-  std::vector<int> adj;
+  bool value, checked;
+  std::string name;
+  Opcode type;
+  std::vector<std::string> parameters;
 };
 
-node createNewNode(std::string is, int type, int &totalNodes,std::map<std::string,int> &indexNodes){
+node createNewNode(std::string is,bool checked, int &totalNodes,std::map<std::string,int> &indexNodes){
   node tmp;
-  indexNodes[is] = totalNodes++;
-  tmp.dIn = 0;
-  tmp.type = type;
-  tmp.typeFunction = Opcode::Buf;
+  indexNodes[is] = totalNodes;
+  std::cout << totalNodes << "\n";
+  tmp.checked = checked;
+  tmp.type = Opcode::Buf;
   tmp.value = false;
-
+  tmp.name = is;
+  totalNodes++;
   return tmp;
 }
 
-void addNodes(std::map<std::string,int> &indexNodes, std::vector<node> &nodes, std::vector<std::string> listNodes, int &totalNodes, int type){
+void addNodes(std::map<std::string,int> &indexNodes, std::vector<node> &nodes, std::vector<std::string> &listNodes, int &totalNodes, bool checked){
   for(auto is : listNodes)
-    nodes.push_back(createNewNode(is,type,totalNodes,indexNodes));
+    nodes.push_back(createNewNode(is,checked,totalNodes,indexNodes));
 }
 
 void addLiteralNode(std::map<std::string,int> &indexNodes, std::vector<node> &nodes,int &totalNodes, std::string typeLiteral){
-  bool value;
-  
-  if(typeLiteral == "1'b1") value = true;
-  else value = false;
-
-  node tmp = createNewNode(typeLiteral,0,totalNodes,indexNodes); 
-  tmp.value = value;
+  node tmp = createNewNode(typeLiteral,true,totalNodes,indexNodes);
+  tmp.value = (typeLiteral == "1'b1")? true : false;
   nodes.push_back(tmp); 
 }
 
@@ -54,88 +48,73 @@ void addFunctionsTypeNodes(std::map<std::string,int> &indexNodes, std::vector<no
   for(auto it : v.functions) {
     if(it.op == Opcode::Not || it.op == Opcode::Buf){
       node tmp;
-      int j = (int)it.parameters.size();
       
-      tmp.typeFunction = it.op;
-      tmp.value = tmp.dIn = tmp.type = 1;
-      nodes[indexNodes[it.parameters[j-1]]].adj.push_back(totalNodes);
-      
-      for(int i = 0; i < (j-1); i++){
-	tmp.adj.push_back(indexNodes[it.parameters[i]]);
-	nodes[indexNodes[it.parameters[i]]].dIn++;
-      }
+      tmp.type = it.op;
+      tmp.checked = false;
+      tmp.parameters = it.parameters; 
       nodes.push_back(tmp);
       totalNodes++;
     }
     else{
-      int index = indexNodes[it.parameters[0]], i = 0;
-      nodes[index].type = 1;
-      nodes[index].typeFunction = it.op;
+      int index = indexNodes[it.parameters[0]];
+      nodes[index].type = it.op;
       nodes[index].value = (it.op == Opcode::And || it.op == Opcode::Nand);
-        
-      for(auto iv: it.parameters){
-	if(it.parameters[0] != iv){	  
-	  nodes[indexNodes[iv]].adj.push_back(index);
-	  nodes[index].dIn++;   
-	}
-      }
+      nodes[index].parameters = it.parameters;
     }
   } 
-}  
+}
 
-void booleanTest(std::map<std::string,int> &indexNodes, std::vector<node> &nodes){
-  std::queue<int> searchOrder;
+bool booleanTest(int u, std::map<std::string,int> &indexNodes, std::vector<node> &nodes){
+  bool value, flag;
+  int index, i;
+  
+  nodes[u].checked = true;
 
-  for(int it = 0, i = 0; it < nodes.size(); it++, i++)
-    if(!nodes[it].type) searchOrder.push(it);
+  std::cout << nodes[u].type << "|| "<< nodes[u].name << "\n"; 
+  
+  if(!(nodes[u].type == Opcode::Not || nodes[u].type == Opcode::Buf)){
+    for(i = 1; i < nodes[u].parameters.size() && !flag; i++){
+      index = indexNodes[nodes[u].parameters[i]];
 
-  while(!searchOrder.empty()){
-    int u = searchOrder.front();
-    searchOrder.pop();
-    
-    for(auto v : nodes[u].adj){
-      if(nodes[v].dIn){
-	nodes[v].dIn--;
-	switch(nodes[v].typeFunction){
-	   case Opcode::And:
-	     nodes[v].value &= nodes[u].value;
-	     if(!nodes[v].value) nodes[v].dIn = 0;
-	     break;
-	   case Opcode::Nand:
-	     nodes[v].value &= nodes[u].value;
-	     if(!nodes[v].dIn) nodes[v].value = !nodes[v].value;;
-	     break;
-	   case Opcode::Or:
-	     nodes[v].value |= nodes[u].value;
-	     if(nodes[v].value) nodes[v].dIn = 0;
-	     break;
-	   case Opcode::Nor:
-	     nodes[v].value |= nodes[u].value;
-	     if(!nodes[v].dIn) nodes[v].value = !nodes[v].value;
-	     break;
-	   case Opcode::Xor:
-	     nodes[v].value ^= nodes[u].value;
-	     break;
-	   case Opcode::Xnor:
-	     nodes[v].value ^= nodes[u].value;
-	     if (!nodes[v].dIn) nodes[v].value = !nodes[v].value;
-	     break;
-	   case Opcode::Buf:
-	     nodes[v].value = nodes[u].value;
-	     break;
-	   case Opcode::Not:
-	     nodes[v].value = !nodes[u].value;
-	     break;
-	}
-	if (!nodes[v].dIn)  searchOrder.push(v);
+      value = (nodes[index].checked)? nodes[index].value: booleanTest(index,indexNodes,nodes);
+      
+      switch(nodes[u].type){
+        case Opcode::And: case Opcode::Nand:
+	   nodes[u].value &= value;
+	   if(!nodes[u].value) flag = true;	   
+	   break;
+         case Opcode::Or: case Opcode::Nor:
+	   nodes[u].value |= value;
+	   if(nodes[u].value) flag = true;	    
+	   break;
+         case Opcode::Xor: case Opcode::Xnor:
+	   nodes[u].value ^= value;
+	   break;
       }
+      
+      if(nodes[u].type == Opcode::Nand && nodes[u].type == Opcode::Nor && nodes[u].type == Opcode::Xnor)
+	nodes[u].value = !nodes[u].value;
     }
   }
+  else{
+    index = indexNodes[nodes[u].parameters[nodes[u].parameters.size()-1]];
+    value = (nodes[index].checked)? nodes[index].value : booleanTest(index,indexNodes,nodes);
+    
+    if(nodes[u].type == Opcode::Not)
+      nodes[u].value == !nodes[u].value;
+    
+    for(i = 0; i < (nodes[u].parameters.size()-1); i++){
+      nodes[indexNodes[nodes[u].parameters[i]]].value = value;
+      nodes[indexNodes[nodes[u].parameters[i]]].checked = true;
+    }
+  }
+
+  return nodes[u].value;
 }
 
 int main(int nargs, char** argv){
   int totalNodes = 0, i = 0;
-  bool entradas[]= {0,1,1,1};
+  bool entradas[]= {1,1,0,1};
   Verilog v;
   
   std::map<std::string,int> indexNodes;
@@ -146,21 +125,24 @@ int main(int nargs, char** argv){
   istream_iterator begin(input);
   istream_iterator end;
   parse_verilog(v, begin, end);
-
+  
   addLiteralNode(indexNodes,nodes,totalNodes,"1'b0");
   addLiteralNode(indexNodes,nodes,totalNodes,"1'b1");
-  addNodes(indexNodes,nodes,v.inputs,totalNodes,0);
-  addNodes(indexNodes,nodes,v.outputs,totalNodes,1);
-  addNodes(indexNodes,nodes,v.wires,totalNodes,3); 
+  addNodes(indexNodes,nodes,v.inputs,totalNodes,true);
+  addNodes(indexNodes,nodes,v.outputs,totalNodes,true);
+  addNodes(indexNodes,nodes,v.wires,totalNodes,false); 
   addFunctionsTypeNodes(indexNodes,nodes,v,totalNodes); 
-
+  
   for(auto it : v.inputs)
     nodes[indexNodes[it]].value = entradas[i++];
-  
-  booleanTest(indexNodes,nodes);
-  
+
+  for(int i = 2; i < nodes.size(); i++){
+    if(!nodes[i].checked)
+      booleanTest(i,indexNodes,nodes);    
+  }
+ 
   for(auto it : v.outputs)
     std::cout << std::boolalpha << nodes[indexNodes[it]].value <<"\n";
-
+  
   return 1;
 }

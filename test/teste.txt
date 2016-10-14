@@ -1,0 +1,13 @@
+digraph G {
+0 [label="0", shape=box]; 
+1 [label="1", shape=box]; 
+2 [label="a", shape=circle];
+3 [label="b", shape=circle];
+4 [label="", shape=circle];
+5 [label="", shape=circle];
+2->1 [style=solid];
+2->0 [style=dashed];
+3->1 [style=solid];
+3->0 [style=dashed];
+2->5 [style=solid];
+}

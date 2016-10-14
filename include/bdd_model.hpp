@@ -16,12 +16,12 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/graphviz.hpp>
 
-namespace verilog 
+namespace verilog
 {
   namespace bdd {
 
-    enum class NegP { 
-      Positive, Negative   
+    enum class NegP {
+      Positive, Negative
     };
 
     enum class Type {
@@ -34,9 +34,9 @@ namespace verilog
     };
 
     typedef boost::adjacency_list<
-      boost::setS, 
-      boost::vecS, 
-      boost::bidirectionalS, 
+      boost::setS,
+      boost::vecS,
+      boost::bidirectionalS,
       Node, NegP> GD;
 
     typedef unsigned int hashcode;
@@ -47,16 +47,16 @@ namespace verilog
       /**
        * The node representing the sinks of the BDD
        */
-      int zero, 
-          one, 
+      int zero,
+          one,
           /**
            * The node representing the source of the bdd
            */
           source;
-      
+
       std::map<hashcode, std::vector<int> > bdd_heap;
 
-      BDD(const std::string name) { 
+      BDD(const std::string name) {
         zero = boost::add_vertex(graph);
         one  = boost::add_vertex(graph);
         source = add_vertex(name);
@@ -67,7 +67,7 @@ namespace verilog
         graph[zero].t = Type::Zero;
         graph[one].t  = Type::One;
       }
-      
+
       /**
        * Creates a copy of a,
        * merges all nodes of b into the copy.
@@ -107,7 +107,7 @@ namespace verilog
        * and returns the new source.
        */
       int conjunction_internal(int a, int b) {
-        // TODO
+        add_edge(a, b, NegP::Positive);
         return 0;
       }
 
@@ -137,7 +137,7 @@ namespace verilog
         graph[one].t  = Type::One;
       }
 
-      /** 
+      /**
        * USE WITH CAUTION, as it changes the current BDD
        * merges the input edges of the node b into node a.
        */
@@ -145,14 +145,14 @@ namespace verilog
         GD::in_edge_iterator e, end;
         for (boost::tie(e, end) = in_edges(b, graph); e != end; ++e) {
             int s = boost::source(*e, graph);
-            add_edge(s, a, graph[*e]); 
+            add_edge(s, a, graph[*e]);
         }
       }
 
       std::map<int, std::vector<int> > find_layers() {
         // TODO
       }
-     
+
       // Criar um hash o mais unico possivel para um bdd
       hashcode hash(int v) {
         // TODO
@@ -172,7 +172,7 @@ namespace verilog
       }
 
       friend bool operator==(const BDD & bdd1, const BDD & bdd2) {
-        return 
+        return
           (bdd1.source == bdd2.source) &&
           (bdd1.one == bdd2.one) &&
           (bdd1.zero == bdd2.zero);
@@ -180,7 +180,7 @@ namespace verilog
         //  (bdd1.graph == bdd2.graph);
       }
       friend bool operator!=(const BDD & bdd1, const BDD & bdd2) {
-        return 
+        return
           (bdd1.source != bdd2.source) &&
           (bdd1.one != bdd2.one) &&
           (bdd1.zero != bdd2.zero);
@@ -192,7 +192,7 @@ namespace verilog
       int size() {
         int i = 0;
         GD::vertex_iterator n, e;
-        for(boost::tie(n, e) = boost::vertices(graph); 
+        for(boost::tie(n, e) = boost::vertices(graph);
             n != e; ++n) ++i;
         return i;
       }
@@ -205,8 +205,8 @@ namespace verilog
             v != vend; ++v) {
           switch(b.graph[*v].t) {
             case(Type::Input) : {
-                o << *v << " [label=\"" 
-                  << b.graph[*v].input_name 
+                o << *v << " [label=\""
+                  << b.graph[*v].input_name
                   << "\", ";
                 if (*v == b.source)
                   o << "shape=doublecircle];\n";
@@ -251,4 +251,3 @@ namespace verilog
     };
   }
 }
-

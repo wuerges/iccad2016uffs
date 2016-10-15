@@ -244,13 +244,22 @@ namespace verilog
 
       friend std::ostream& operator<<(std::ostream &o, const BDD & b) {
 
-        o << "digraph G {\n" ;
+        int i = 0;
+        std::map<GD::vertex_descriptor, int> node_map;
         GD::vertex_iterator v, vend;
+
+        for(boost::tie(v, vend) = boost::vertices(b.graph);
+            v != vend; ++v) {
+          node_map[*v] = i++;
+        }
+
+
+        o << "digraph G {\n" ;
         for(boost::tie(v, vend) = boost::vertices(b.graph);
             v != vend; ++v) {
           switch(b.graph[*v].t) {
             case(Type::Input) : {
-                o << *v << " [label=\""
+                o << node_map[*v] << " [label=\""
                   << b.graph[*v].input_name
                   << "\", ";
                 if (*v == b.source)
@@ -260,11 +269,11 @@ namespace verilog
               break;
             }
             case(Type::One) : {
-                o << *v << " [label=\"1\", shape=box]; \n";
+                o << node_map[*v] << " [label=\"1\", shape=box]; \n";
               break;
             }
             case(Type::Zero) : {
-                o << *v << " [label=\"0\", shape=box]; \n";
+                o << node_map[*v] << " [label=\"0\", shape=box]; \n";
               break;
             }
           }
@@ -276,7 +285,7 @@ namespace verilog
           GD::vertex_descriptor s = boost::source(*e, b.graph);
           GD::vertex_descriptor d = boost::target(*e, b.graph);
 
-          o << s << "->" << d;
+          o << node_map[s] << "->" << node_map[d];
           switch(b.graph[*e]) {
             case(NegP::Positive): {
               o << " [style=solid];\n";

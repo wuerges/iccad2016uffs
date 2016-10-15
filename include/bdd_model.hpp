@@ -35,7 +35,7 @@ namespace verilog
 
     typedef boost::adjacency_list<
       boost::setS,
-      boost::vecS,
+      boost::setS,
       boost::bidirectionalS,
       Node, NegP> GD;
 
@@ -44,15 +44,16 @@ namespace verilog
     struct BDD {
       GD graph;
 
-      /**
-       * The node representing the sinks of the BDD
-       */
-      int zero,
-          one,
-          /**
-           * The node representing the source of the bdd
-           */
-          source;
+      GD::vertex_descriptor 
+        /**
+         * The nodes representing the sinks of the BDD
+         */
+        zero,
+        one,
+        /**
+         * The node representing the source of the bdd
+         */
+        source;
 
       std::map<hashcode, std::vector<int> > bdd_heap;
 
@@ -73,30 +74,65 @@ namespace verilog
        * merges all nodes of b into the copy.
        * calls the conjunction_internal function for the copy.
        */
+
+      void copy_graph(const BDD & o, 
+          std::map<GD::vertex_descriptor,
+                   GD::vertex_descriptor> & node_map
+          ) {
+
+        GD::vertex_iterator v, vend;
+        for(boost::tie(v, vend) = boost::vertices(o.graph);
+            v != vend; ++v) {
+          GD::vertex_descriptor n = boost::add_vertex(graph);
+          graph[n].input_name = o.graph[*v].input_name;
+          graph[n].t          = o.graph[*v].t         ;
+          node_map[*v] = n;
+        }
+        
+        GD::edge_iterator e, eend;
+        for(boost::tie(e, eend) = boost::edges(o.graph);
+            e != eend; ++e) {
+          GD::vertex_descriptor s = boost::source(*e, o.graph);
+          GD::vertex_descriptor d = boost::target(*e, o.graph);
+          boost::add_edge(node_map[s], node_map[d], o.graph[*e], graph);
+        }
+      }
+
       BDD operator&(const BDD & b) {
 
-        typedef std::map<GD::vertex_descriptor, GD::vertex_descriptor> node_map_t;
-        node_map_t node_map;
-        boost::associative_property_map<node_map_t> mapper(node_map);
+        std::map<GD::vertex_descriptor,
+          GD::vertex_descriptor> node_map;
 
         BDD c = *this;
-        copy_graph(b.graph, c.graph, boost::orig_to_copy(mapper));
+        c.copy_graph(b, node_map);
 
-        int old_zero = node_map[b.zero];
-        int old_one  = node_map[b.one];
+        GD::vertex_descriptor old_zero   = node_map[b.zero];
+        GD::vertex_descriptor old_one    = node_map[b.one];
+        GD::vertex_descriptor old_source = node_map[b.source];
+
+        std::cout << "BDD c => " << c << "\n";
 
         // copies the old one edges into the new graph
         c.merge_input_edges(c.one, old_one);
+        std::cout << "merged one c => " << c << "\n";
+
+        std::cout << "merging " << old_one << " into " << c.one << "\n";
         boost::clear_vertex(old_one, c.graph);
         boost::remove_vertex(old_one, c.graph);
 
         // copies the old zero edges into the new graph
         c.merge_input_edges(c.zero, old_zero);
+        std::cout << "merged zero c => " << c << "\n";
+        std::cout << "merging " << old_zero << " into " << c.zero << "\n";
         boost::clear_vertex(old_zero, c.graph);
         boost::remove_vertex(old_zero, c.graph);
 
-        c.source = c.conjunction_internal(c.source, node_map[c.source]);
+        std::cout << "before conjunction internal " << c << "\n";
+
+        c.source = c.conjunction_internal(c.source, old_source);
+        std::cout << "new source " << c.source << "\n";
         return c;
+
 
       }
 
@@ -106,20 +142,27 @@ namespace verilog
        * Accepts the nodes that must be conjoined
        * and returns the new source.
        */
-      int conjunction_internal(int a, int b) {
+      GD::vertex_descriptor
+        conjunction_internal(
+          GD::vertex_descriptor & a, 
+          GD::vertex_descriptor & b) {
+        std::cout << "conjunction_internal " << a << " " << b << "\n";
         add_edge(a, b, NegP::Positive);
         return 0;
       }
 
 
-      int add_vertex(const std::string name) {
-        int v = boost::add_vertex(graph);
+      GD::vertex_descriptor add_vertex(const std::string name) {
+        GD::vertex_descriptor v = boost::add_vertex(graph);
         graph[v].input_name = name;
         graph[v].t          = Type::Input;
         return v;
       }
 
-      void add_edge(int a, int b, NegP p) {
+      void add_edge(
+          GD::vertex_descriptor & a, 
+          GD::vertex_descriptor & b, 
+          NegP p) {
         boost::add_edge(a, b, p, graph);
       }
 
@@ -129,7 +172,7 @@ namespace verilog
        */
       public:
       void reverse() {
-        int aux = one;
+        GD::vertex_descriptor aux = one;
         one = zero;
         zero = aux;
 
@@ -141,10 +184,12 @@ namespace verilog
        * USE WITH CAUTION, as it changes the current BDD
        * merges the input edges of the node b into node a.
        */
-      void merge_input_edges(int a, int b) {
+      void merge_input_edges(
+          GD::vertex_descriptor a, 
+          GD::vertex_descriptor b) {
         GD::in_edge_iterator e, end;
         for (boost::tie(e, end) = in_edges(b, graph); e != end; ++e) {
-            int s = boost::source(*e, graph);
+            GD::vertex_descriptor s = boost::source(*e, graph);
             add_edge(s, a, graph[*e]);
         }
       }
@@ -228,8 +273,8 @@ namespace verilog
         GD::edge_iterator e, eend;
         for(boost::tie(e, eend) = boost::edges(b.graph);
             e != eend; ++e) {
-          int s = boost::source(*e, b.graph);
-          int d = boost::target(*e, b.graph);
+          GD::vertex_descriptor s = boost::source(*e, b.graph);
+          GD::vertex_descriptor d = boost::target(*e, b.graph);
 
           o << s << "->" << d;
           switch(b.graph[*e]) {

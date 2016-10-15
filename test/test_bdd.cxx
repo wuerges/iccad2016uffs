@@ -20,6 +20,8 @@ int main(int nargs, char** argv){
 
   BDD c = a & b;
 
+  std::cout << a;
+  std::cout << b;
   std::cout << c;
 
   return 0;

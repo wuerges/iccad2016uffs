@@ -26,7 +26,14 @@ namespace verilog
     struct G {
       std::map<const std::string, int> name_map;
       std::vector<std::string> inputs, outputs;
+      GD::vertex_descriptor zero, one;
       GD graph;
+
+      G() {
+        zero = get_vertex("1'b0");
+        one  = get_vertex("1'b1");
+      }
+
 
       int add_vertex(std::string name) {
         int v = new_vertex();

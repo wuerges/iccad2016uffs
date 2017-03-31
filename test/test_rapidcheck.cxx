@@ -1,3 +1,7 @@
+
+
+#include <graph_model_arbitrary.hpp>
+
 #include <rapidcheck.h>
 
 #include <vector>

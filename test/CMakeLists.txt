@@ -15,6 +15,9 @@ add_executable(TestConvert1.x converts_a_verilog_to_a_graph.cxx)
 add_executable(simulation.x simulation.cxx)
 add_executable(TestBDD.x test_bdd.cxx)
 
+add_executable(TestRapidCheck.x test_rapidcheck.cxx)
+target_link_libraries(TestRapidCheck.x rapidcheck)
+
 target_link_libraries(TestBDD.x 
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
@@ -54,6 +57,7 @@ target_link_libraries(simulation.x
 
 # Novos testes devem ser adicionados aqui 
 
+add_test(check_rapidcheck TestRapidCheck.x)
 add_test(check_if_spirit_runs TestSpirit1.x)
 add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)
 
@@ -134,7 +138,8 @@ FOREACH(i
 ./testcases/unit17/in_1.v
 ./testcases/unit17/in_2.v
 )
-  add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
+  # Commented for a while because it takes too much time to run
+  #add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
   #add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
 ENDFOREACH()
 

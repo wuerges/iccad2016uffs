@@ -40,15 +40,15 @@ namespace verilog {
       }
 
       // Initialize the constants 
-      g.graph[g.name_map["1'b0"]] = LogicValue::False;
-      g.graph[g.name_map["1'b1"]] = LogicValue::True;
+      g.graph[g.name_map["1'b0"]] = LogicValue::Zero;
+      g.graph[g.name_map["1'b1"]] = LogicValue::One;
 
       // Propagate the values to the outputs
       for (int node : topo_order) {
         if(in_degree(node, g.graph) > 0) {
           auto p = in_edges(node, g.graph);
 
-          LogicValue sum = LogicValue::True;
+          LogicValue sum = LogicValue::One;
 
           for (auto e = p.first; e != p.second; ++e) {
 

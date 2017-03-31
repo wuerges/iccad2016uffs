@@ -5,6 +5,10 @@
 #include <stdexcept>
 
 namespace verilog {
+  enum class NegP { 
+    Positive, Negative   
+  };
+
   enum class LogicValue { 
     Zero, True, False, Invalid
   };

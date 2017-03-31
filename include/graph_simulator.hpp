@@ -17,7 +17,7 @@
 namespace verilog {
   namespace graph {
 
-    LogicValue propagate(LogicValue v, graph::NegP np) {
+    LogicValue propagate(LogicValue v, NegP np) {
       checkValid(v);
 
       return np == NegP::Positive ? v : !v;

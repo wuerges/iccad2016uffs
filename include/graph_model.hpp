@@ -17,10 +17,6 @@ namespace verilog
 {
   namespace graph {
 
-    enum class NegP { 
-      Positive, Negative   
-    };
-
     typedef boost::adjacency_list<
       boost::setS, 
       boost::vecS, 
@@ -38,7 +34,6 @@ namespace verilog
         name_map[name] = v;
         return v;
       }
-
 
       std::string new_named_vertex() {
         int v = new_vertex();

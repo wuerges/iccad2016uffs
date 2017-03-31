@@ -16,7 +16,7 @@ namespace verilog {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
         it != --f.parameters.end();  ++it) {
-      g.add_edge(orig, *it, graph::NegP::Negative);
+      g.add_edge(orig, *it, NegP::Negative);
     }
   }
   /// For the BUF port, the input is the back
@@ -25,7 +25,7 @@ namespace verilog {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
         it != --f.parameters.end();  ++it) {
-      g.add_edge(orig, *it, graph::NegP::Positive);
+      g.add_edge(orig, *it, NegP::Positive);
     }
   }
 
@@ -35,19 +35,19 @@ namespace verilog {
     std::string t3 = g.new_named_vertex();
     std::string t4 = g.new_named_vertex();
 
-    g.add_edge(i1, t1, graph::NegP::Positive);
-    g.add_edge(i2, t1, graph::NegP::Positive);
+    g.add_edge(i1, t1, NegP::Positive);
+    g.add_edge(i2, t1, NegP::Positive);
 
-    g.add_edge(i1, t2, graph::NegP::Positive);
-    g.add_edge(t1, t2, graph::NegP::Negative);
+    g.add_edge(i1, t2, NegP::Positive);
+    g.add_edge(t1, t2, NegP::Negative);
 
-    g.add_edge(i2, t3, graph::NegP::Positive);
-    g.add_edge(t1, t3, graph::NegP::Negative);
+    g.add_edge(i2, t3, NegP::Positive);
+    g.add_edge(t1, t3, NegP::Negative);
 
-    g.add_edge(t2, t4, graph::NegP::Negative);
-    g.add_edge(t3, t4, graph::NegP::Negative);
+    g.add_edge(t2, t4, NegP::Negative);
+    g.add_edge(t3, t4, NegP::Negative);
 
-    g.add_edge(t4, o, graph::NegP::Positive);
+    g.add_edge(t4, o, NegP::Positive);
   }
 
   void add_function_xor(std::string i1, std::string i2, std::string o, graph::G & g) {
@@ -56,19 +56,19 @@ namespace verilog {
     std::string t3 = g.new_named_vertex();
     std::string t4 = g.new_named_vertex();
 
-    g.add_edge(i1, t1, graph::NegP::Positive);
-    g.add_edge(i2, t1, graph::NegP::Positive);
+    g.add_edge(i1, t1, NegP::Positive);
+    g.add_edge(i2, t1, NegP::Positive);
 
-    g.add_edge(i1, t2, graph::NegP::Positive);
-    g.add_edge(t1, t2, graph::NegP::Negative);
+    g.add_edge(i1, t2, NegP::Positive);
+    g.add_edge(t1, t2, NegP::Negative);
 
-    g.add_edge(i2, t3, graph::NegP::Positive);
-    g.add_edge(t1, t3, graph::NegP::Negative);
+    g.add_edge(i2, t3, NegP::Positive);
+    g.add_edge(t1, t3, NegP::Negative);
 
-    g.add_edge(t2, t4, graph::NegP::Negative);
-    g.add_edge(t3, t4, graph::NegP::Negative);
+    g.add_edge(t2, t4, NegP::Negative);
+    g.add_edge(t3, t4, NegP::Negative);
 
-    g.add_edge(t4, o, graph::NegP::Negative);
+    g.add_edge(t4, o, NegP::Negative);
   }
 
   void add_function_xnor(std::vector<std::string> & is, 
@@ -128,11 +128,11 @@ namespace verilog {
   }
 
   // 
-  void add_function_NP(ast::Function & f, graph::G & g, graph::NegP np_in, graph::NegP np_out) {
+  void add_function_NP(ast::Function & f, graph::G & g, NegP np_in, NegP np_out) {
     std::string dest;
-    if (np_out == graph::NegP::Negative) { 
+    if (np_out == NegP::Negative) { 
       dest = g.new_named_vertex();
-      g.add_edge(dest, f.parameters.front(), graph::NegP::Negative);
+      g.add_edge(dest, f.parameters.front(), NegP::Negative);
     }
     else {
       dest = f.parameters.front();
@@ -145,24 +145,24 @@ namespace verilog {
 
   /// For the AND port, the output is the front
   void add_function_and(ast::Function & f, graph::G & g) {
-    add_function_NP(f, g, graph::NegP::Positive, graph::NegP::Positive);
+    add_function_NP(f, g, NegP::Positive, NegP::Positive);
   }
   
   // NOR is equivalent to AND with negation of all inputs.
   void add_function_nor(ast::Function & f, graph::G & g) {
-    add_function_NP(f, g, graph::NegP::Negative, graph::NegP::Positive);
+    add_function_NP(f, g, NegP::Negative, NegP::Positive);
   }
 
   /// The OR port is an NOR port with the output negated.
   // This needs an extra vertex.
   void add_function_or(ast::Function & f, graph::G & g) {
-    add_function_NP(f, g, graph::NegP::Negative, graph::NegP::Negative);
+    add_function_NP(f, g, NegP::Negative, NegP::Negative);
   }
 
   /// The NAD port is an AND port with the output negated.
   // This needs an extra vertex.
   void add_function_nand(ast::Function & f, graph::G & g) {
-    add_function_NP(f, g, graph::NegP::Positive, graph::NegP::Negative);
+    add_function_NP(f, g, NegP::Positive, NegP::Negative);
   }
 
   void convert(ast::Verilog & v, graph::G &g) {

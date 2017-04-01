@@ -23,8 +23,8 @@ using namespace std::chrono;
 
 
 void generate_match(Generator & g, 
-    graph::G & g1, 
-    graph::G & g2, 
+    graph::G_builder & g1, 
+    graph::G_builder & g2, 
     const ast::Verilog & v1,
     const ast::Verilog & v2,
     const int max_duration,
@@ -103,7 +103,7 @@ int main(int nargs, char** argv){
   int number;
   ss >> number;
 
-  graph::G g1, g2;
+  graph::G_builder g1, g2;
   convert(v1, g1);
   convert(v2, g2);
 

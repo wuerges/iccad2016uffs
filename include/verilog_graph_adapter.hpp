@@ -12,7 +12,7 @@ namespace verilog {
   /// For the NOT port, the input is the back
   // The edges are Negative
 
-  void add_function_not(ast::Function & f, graph::G & g) {
+  void add_function_not(ast::Function & f, graph::G_builder & g) {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
         it != --f.parameters.end();  ++it) {
@@ -21,7 +21,7 @@ namespace verilog {
   }
   /// For the BUF port, the input is the back
   // The edges are Positive
-  void add_function_buf(ast::Function & f, graph::G & g) {
+  void add_function_buf(ast::Function & f, graph::G_builder & g) {
     std::string orig = f.parameters.back();
     for(auto it = f.parameters.begin();
         it != --f.parameters.end();  ++it) {
@@ -29,113 +29,114 @@ namespace verilog {
     }
   }
 
-  void add_function_xnor(std::string i1, std::string i2, std::string o, graph::G & g) {
-    std::string t1 = g.new_named_vertex();
-    std::string t2 = g.new_named_vertex();
-    std::string t3 = g.new_named_vertex();
-    std::string t4 = g.new_named_vertex();
+  /*
+  void add_function_xnor_1(int i1, int i2, int o, graph::G_builder & b) {
+    int t1 = b.g.new_vertex();
+    int t2 = b.g.new_vertex();
+    int t3 = b.g.new_vertex();
+    int t4 = b.g.new_vertex();
 
-    g.add_edge(i1, t1, NegP::Positive);
-    g.add_edge(i2, t1, NegP::Positive);
+    b.add_edge(i1, t1, NegP::Positive);
+    b.add_edge(i2, t1, NegP::Positive);
 
-    g.add_edge(i1, t2, NegP::Positive);
-    g.add_edge(t1, t2, NegP::Negative);
+    b.add_edge(i1, t2, NegP::Positive);
+    b.add_edge(t1, t2, NegP::Negative);
 
-    g.add_edge(i2, t3, NegP::Positive);
-    g.add_edge(t1, t3, NegP::Negative);
+    b.add_edge(i2, t3, NegP::Positive);
+    b.add_edge(t1, t3, NegP::Negative);
 
-    g.add_edge(t2, t4, NegP::Negative);
-    g.add_edge(t3, t4, NegP::Negative);
+    b.add_edge(t2, t4, NegP::Negative);
+    b.add_edge(t3, t4, NegP::Negative);
 
-    g.add_edge(t4, o, NegP::Positive);
+    b.add_edge(t4, o, NegP::Positive);
+  }
+  */
+
+  void add_function_xor_1(int i1, int i2, int o, graph::G_builder & b) {
+    int t1 = b.g.new_vertex();
+    int t2 = b.g.new_vertex();
+    int t3 = b.g.new_vertex();
+    int t4 = b.g.new_vertex();
+
+    b.add_edge(i1, t1, NegP::Positive);
+    b.add_edge(i2, t1, NegP::Positive);
+
+    b.add_edge(i1, t2, NegP::Positive);
+    b.add_edge(t1, t2, NegP::Negative);
+
+    b.add_edge(i2, t3, NegP::Positive);
+    b.add_edge(t1, t3, NegP::Negative);
+
+    b.add_edge(t2, t4, NegP::Negative);
+    b.add_edge(t3, t4, NegP::Negative);
+
+    b.add_edge(t4, o, NegP::Negative);
   }
 
-  void add_function_xor(std::string i1, std::string i2, std::string o, graph::G & g) {
-    std::string t1 = g.new_named_vertex();
-    std::string t2 = g.new_named_vertex();
-    std::string t3 = g.new_named_vertex();
-    std::string t4 = g.new_named_vertex();
-
-    g.add_edge(i1, t1, NegP::Positive);
-    g.add_edge(i2, t1, NegP::Positive);
-
-    g.add_edge(i1, t2, NegP::Positive);
-    g.add_edge(t1, t2, NegP::Negative);
-
-    g.add_edge(i2, t3, NegP::Positive);
-    g.add_edge(t1, t3, NegP::Negative);
-
-    g.add_edge(t2, t4, NegP::Negative);
-    g.add_edge(t3, t4, NegP::Negative);
-
-    g.add_edge(t4, o, NegP::Negative);
-  }
-
-  void add_function_xnor(std::vector<std::string> & is, 
-      std::string o, graph::G & g) {
-    if (is.size() < 2) {
-      throw std::invalid_argument("Input size is smaller than 2");
+  void add_function_xor(int v1, std::vector<std::string> & is, 
+      int vo, graph::G_builder & b) {
+    if (is.empty()) {
+      throw std::invalid_argument("Xor input size is smaller than 2");
     }
-    else if (is.size() == 2) {
-      add_function_xnor(is.front(), is.back(), o, g);
+    else if (is.size() == 1) {
+      int v2 = b.get_vertex(is.back());
+      add_function_xor_1(v1, v2, vo, b);
     }
     else {
-      std::string i1 = is.back();
+      int prev_o = b.g.new_vertex();
+      int v2 = b.get_vertex(is.back());
       is.pop_back();
-      std::string i2 = is.back();
-      is.pop_back();
-
-      std::string extra = g.new_named_vertex();
-      add_function_xnor(i1, i2, extra, g);
-
-      is.push_back(extra);
-      add_function_xnor(is, o, g);
+      add_function_xor_1(v1, v2, prev_o, b);
+      add_function_xor(prev_o, is, vo, b);
     }
   }
 
   void add_function_xor(std::vector<std::string> & is, 
-      std::string o, graph::G & g) {
+      int o, graph::G_builder & b) {
     if (is.size() < 2) {
-      throw std::invalid_argument("Input size is smaller than 2");
-    }
-    else if (is.size() == 2) {
-      add_function_xor(is.front(), is.back(), o, g);
+      throw std::invalid_argument("Xor Input size is smaller than 2");
     }
     else {
-      std::string i1 = is.back();
+      int v1 = b.get_vertex(is.back());
       is.pop_back();
-      std::string i2 = is.back();
-      is.pop_back();
-
-      std::string extra = g.new_named_vertex();
-      add_function_xor(i1, i2, extra, g);
-
-      is.push_back(extra);
-      add_function_xor(is, o, g);
+      add_function_xor(v1, is, o, b);
     }
   }
 
-  void add_function_xor(ast::Function & f, graph::G & g) {
-    std::vector<std::string> is(++f.parameters.begin(), f.parameters.end());
-    
-    add_function_xor(is, f.parameters.front(), g);
+  void add_function_xnor(std::vector<std::string> & is, 
+      std::string o, graph::G_builder & b) {
+    if (is.size() < 2) {
+      throw std::invalid_argument("Xnor Input size is smaller than 2");
+    }
+    else {
+      int extra = b.g.new_vertex();
+      add_function_xor(is, extra, b);
+      b.add_edge(extra, o, NegP::Negative);
+    }
   }
 
-  void add_function_xnor(ast::Function & f, graph::G & g) {
+  void add_function_xor(ast::Function & f, graph::G_builder & g) {
+    std::vector<std::string> is(++f.parameters.begin(), f.parameters.end());
+    
+    int o = g.get_vertex(f.parameters.front());
+    add_function_xor(is, o, g);
+  }
+
+  void add_function_xnor(ast::Function & f, graph::G_builder & g) {
     std::vector<std::string> is(++f.parameters.begin(), f.parameters.end());
     
     add_function_xnor(is, f.parameters.front(), g);
   }
 
   // 
-  void add_function_NP(ast::Function & f, graph::G & g, NegP np_in, NegP np_out) {
-    std::string dest;
+  void add_function_NP(ast::Function & f, graph::G_builder & g, NegP np_in, NegP np_out) {
+    int dest;
     if (np_out == NegP::Negative) { 
-      dest = g.new_named_vertex();
+      dest = g.g.new_vertex();
       g.add_edge(dest, f.parameters.front(), NegP::Negative);
     }
     else {
-      dest = f.parameters.front();
+      dest = g.get_vertex(f.parameters.front());
     }
     for(auto it = ++f.parameters.begin();
         it != f.parameters.end();  ++it) {
@@ -144,36 +145,33 @@ namespace verilog {
   }
 
   /// For the AND port, the output is the front
-  void add_function_and(ast::Function & f, graph::G & g) {
+  void add_function_and(ast::Function & f, graph::G_builder & g) {
     add_function_NP(f, g, NegP::Positive, NegP::Positive);
   }
   
   // NOR is equivalent to AND with negation of all inputs.
-  void add_function_nor(ast::Function & f, graph::G & g) {
+  void add_function_nor(ast::Function & f, graph::G_builder & g) {
     add_function_NP(f, g, NegP::Negative, NegP::Positive);
   }
 
   /// The OR port is an NOR port with the output negated.
   // This needs an extra vertex.
-  void add_function_or(ast::Function & f, graph::G & g) {
+  void add_function_or(ast::Function & f, graph::G_builder & g) {
     add_function_NP(f, g, NegP::Negative, NegP::Negative);
   }
 
   /// The NAD port is an AND port with the output negated.
   // This needs an extra vertex.
-  void add_function_nand(ast::Function & f, graph::G & g) {
+  void add_function_nand(ast::Function & f, graph::G_builder & g) {
     add_function_NP(f, g, NegP::Positive, NegP::Negative);
   }
 
-  void convert(ast::Verilog & v, graph::G &g) {
+  void convert(ast::Verilog & v, graph::G_builder &g) {
 
     g.inputs = v.inputs;
     //std::sort(g.inputs.begin(), g.inputs.end());
     g.outputs = v.outputs;
     //std::sort(g.outputs.begin(), g.outputs.end());
-
-    g.add_vertex("1'b0");
-    g.add_vertex("1'b1");
 
     for(auto w : v.outputs)
       g.add_vertex(w);

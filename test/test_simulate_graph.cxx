@@ -21,8 +21,8 @@ int main(int nargs, char** argv){
   parser::parse_verilog_file(v, argv[1]);
 
 
-  graph::G g;
-  convert(v, g);
+  graph::G_builder b;
+  convert(v, b);
 
 
   std::vector<bool> input, output1, output2;
@@ -32,7 +32,7 @@ int main(int nargs, char** argv){
 
 
   steady_clock::time_point t1 = steady_clock::now();
-  simulate(input, output1, g);
+  simulate(input, output1, b);
   steady_clock::time_point t2 = steady_clock::now();
   simulate(input, output2, v);
   steady_clock::time_point t3 = steady_clock::now();

@@ -24,7 +24,9 @@ namespace verilog {
     }
 
 
-    void simulate(std::vector<bool> & inputs, std::vector<bool> & outputs, G & g) {
+    void simulate(std::vector<bool> & inputs, std::vector<bool> & outputs, G_builder & b) {
+
+      G & g = b.g;
 		
       using namespace boost;
 	  
@@ -35,13 +37,13 @@ namespace verilog {
 
       // Initialize the inputs
 
-      for (int i = 0; i < g.inputs.size(); ++ i) {
-        g.graph[g.name_map[g.inputs[i]]] = fromBool(inputs[i]);
+      for (int i = 0; i < b.inputs.size(); ++ i) {
+        g.graph[b.name_map[b.inputs[i]]].value = fromBool(inputs[i]);
       }
 
       // Initialize the constants 
-      g.graph[g.name_map["1'b0"]] = LogicValue::Zero;
-      g.graph[g.name_map["1'b1"]] = LogicValue::One;
+      g.graph[g.zero].value = LogicValue::Zero;
+      g.graph[g.one].value = LogicValue::One;
 
       // Propagate the values to the outputs
       for (int node : topo_order) {
@@ -53,18 +55,18 @@ namespace verilog {
           for (auto e = p.first; e != p.second; ++e) {
 
             int s = source(*e, g.graph);
-            LogicValue value = propagate(g.graph[s], g.graph[*e]);
+            LogicValue value = propagate(g.graph[s].value, g.graph[*e]);
 
             sum = sum && value;
           }
-          g.graph[node] = sum;
+          g.graph[node].value = sum;
 
         }
       }
 
       // output the outputs!
-      for(std::string n : g.outputs) {
-        outputs.push_back(toBool(g.graph[g.name_map[n]]));
+      for(std::string n : b.outputs) {
+        outputs.push_back(toBool(g.graph[b.name_map[n]].value));
       }
     }
   }

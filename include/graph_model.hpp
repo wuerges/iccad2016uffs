@@ -68,6 +68,7 @@ namespace verilog
         }
       }
 
+      /*
       std::string new_named_vertex() {
         int v = g.new_vertex();
         std::stringstream ss;
@@ -75,11 +76,30 @@ namespace verilog
         name_map[ss.str()] = v;
         return ss.str();
       }
+      */
 
+      void add_edge(int v1, std::string name2, NegP p) {
+        int v2 = get_vertex(name2);
+        g.add_edge(v1, v2, p);
+      }
+      
       void add_edge(std::string name1, std::string name2, NegP p) {
         int v1 = get_vertex(name1);
         int v2 = get_vertex(name2);
         g.add_edge(v1, v2, p);
+      }
+      
+      void add_edge(std::string name1, int v2, NegP p) {
+        int v1 = get_vertex(name1);
+        g.add_edge(v1, v2, p);
+      }
+
+      void add_edge(int v1, int v2, NegP p) {
+        g.add_edge(v1, v2, p);
+      }
+
+      void add_vertex(std::string name) {
+        g.add_vertex(name);
       }
 
     };

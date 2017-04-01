@@ -23,28 +23,28 @@ namespace rc
 
   // represents an arbitrary graph, generated automatically
   struct AG {
-    G g;
+    G_builder b;
     AG(const std::vector<AEdge> & edges) {
       for(auto it : edges) {
         // Only add edges in one direction, so
         // the resulting graph is directed.
         if (it.from > it.to)
-          g.add_edge(it.from, it.to, it.polarity);
+          b.add_edge(it.from, it.to, it.polarity);
       }
-      remove_in_edge_if(g.one, [](auto e){ return true; } , g.graph);
-      remove_in_edge_if(g.zero, [](auto e){ return true; } , g.graph);
+      remove_in_edge_if(b.g.one, [](auto e){ return true; } , b.g.graph);
+      remove_in_edge_if(b.g.zero, [](auto e){ return true; } , b.g.graph);
 
       // a reverse name map;
       std::map<int, std::string> rev_map;
-      for(auto it : g.name_map) 
+      for(auto it : b.name_map) 
         rev_map[it.second] = it.first;
 
       GD::vertex_iterator v, vend;
-      for(boost::tie(v, vend) = boost::vertices(g.graph); v != vend; ++v) {
-        if(in_degree(*v, g.graph) == 0)
-          g.inputs.push_back(rev_map[*v]);
-        if(out_degree(*v, g.graph) == 0)
-          g.outputs.push_back(rev_map[*v]);
+      for(boost::tie(v, vend) = boost::vertices(b.g.graph); v != vend; ++v) {
+        if(in_degree(*v, b.g.graph) == 0)
+          b.inputs.push_back(rev_map[*v]);
+        if(out_degree(*v, b.g.graph) == 0)
+          b.outputs.push_back(rev_map[*v]);
       }
     }
   };
@@ -87,6 +87,17 @@ struct Arbitrary<AG> {
     return gen::construct<AG>(gen_edges);
   }
 };
+
+template<>
+struct Arbitrary<G> {
+  static Gen<G> arbitrary() {
+
+    return gen::apply([](const AG & ag) {
+          return ag.b.g;
+        }, gen::arbitrary<AG>());
+  }
+};
+
 
 
 }

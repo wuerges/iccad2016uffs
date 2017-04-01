@@ -20,19 +20,19 @@ int main() {
             });
 
   rc::check("nodes zero and one have no inputs",
-    [](const rc::AG & ag) {
-      RC_ASSERT(in_degree(ag.g.zero, ag.g.graph) == 0);
-      RC_ASSERT(in_degree(ag.g.one, ag.g.graph) == 0);
+    [](const G & g) {
+      RC_ASSERT(in_degree(g.zero, g.graph) == 0);
+      RC_ASSERT(in_degree(g.one, g.graph) == 0);
     });
 
   rc::check("inputs have no incomming edges and outputs have no outgoing edges",
     [](const rc::AG & ag) {
-      G g = ag.g;
-      for(auto it : g.inputs)
-        RC_ASSERT(in_degree(g.get_vertex(it), g.graph) == 0);
+      G_builder b = ag.b;
+      for(auto it : b.inputs)
+        RC_ASSERT(in_degree(b.get_vertex(it), b.g.graph) == 0);
 
-      for(auto it : ag.g.outputs)
-        RC_ASSERT(out_degree(g.get_vertex(it), g.graph) == 0);
+      for(auto it : ag.b.outputs)
+        RC_ASSERT(out_degree(b.get_vertex(it), b.g.graph) == 0);
     });
 
 

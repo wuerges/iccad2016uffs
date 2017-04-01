@@ -19,11 +19,22 @@ int main() {
               RC_ASSERT(l0 == l1);
             });
 
-  rc::check("creates the graph an asserts that nodes zero and one have no inputs",
+  rc::check("nodes zero and one have no inputs",
     [](const rc::AG & ag) {
       RC_ASSERT(in_degree(ag.g.zero, ag.g.graph) == 0);
       RC_ASSERT(in_degree(ag.g.one, ag.g.graph) == 0);
     });
+
+  rc::check("inputs have no incomming edges and outputs have no outgoing edges",
+    [](const rc::AG & ag) {
+      G g = ag.g;
+      for(auto it : g.inputs)
+        RC_ASSERT(in_degree(g.get_vertex(it), g.graph) == 0);
+
+      for(auto it : ag.g.outputs)
+        RC_ASSERT(out_degree(g.get_vertex(it), g.graph) == 0);
+    });
+
 
 
   return 0;

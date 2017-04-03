@@ -30,11 +30,14 @@ Since API is not yet defined, it is not wise yet to publish it.
 
 ## Installation
 
-This projects aims to reduce the amount of depencies to the most. However it needs cmake and boost spirit 3.0.
+This projects aims to reduce the amount of depencies to the most. However it needs cmake and boost spirit 3.0 and rapidcheck.
+Rapidcheck is included as a git submodule.
 
 To compile it, run the following commands:
 
 ```
+git clone <url for this repo>
+git submodule update
 cmake .
 make
 ```

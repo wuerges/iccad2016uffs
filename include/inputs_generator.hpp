@@ -14,7 +14,7 @@ namespace verilog {
     //  Generates a random input of a given size
     void generate_inputs(
         const std::vector<std::string> & names, 
-        std::map<std::string, bool> & inputs, int size) {
+        std::map<std::string, bool> & inputs) {
       for(auto n : names) {
         inputs[n] = bd(rng);
       }

@@ -60,6 +60,11 @@ namespace verilog
       std::map<const std::string, int> name_map;
       std::vector<std::string> inputs, outputs;
 
+      G_builder() {
+        name_map[g.graph[g.zero].identifier] = g.zero;
+        name_map[g.graph[g.one].identifier] = g.one;
+      }
+
       int get_vertex(std::string name) {
         auto it = name_map.find(name);
         if (it != name_map.end()) {
@@ -108,13 +113,20 @@ namespace verilog
 
     };
 
-    void write_graph(std::ostream & o, G_builder & b) {
-      boost::write_graphviz(std::cout, b.g.graph
+    void write_graph(std::ostream & out, const G_builder & b) {
+      out << "// inputs:";
+      for(auto i : b.inputs) out << " <" << i << ">";
+      out << "\n";
+      out << "// outputs:";
+      for(auto i : b.outputs) out << " <" << i << ">";
+      out << "\n";
+
+      boost::write_graphviz(out, b.g.graph
           , [&](std::ostream& o, const GD::vertex_descriptor& v) 
-          { o << "[label=" 
+          { o << "[label=\"" 
               << b.g.graph[v].identifier 
               << ": " 
-              << b.g.graph[v].value<< "]";}
+              << b.g.graph[v].value<< "\"]";}
           , [&](std::ostream& o, const GD::edge_descriptor& e) 
           { if (b.g.graph[e] == NegP::Negative)
               o << "[style=dotted]"; }

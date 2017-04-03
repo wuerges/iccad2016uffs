@@ -7,6 +7,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
+#include <algorithm>
+
 using namespace verilog;
 using namespace graph;
 
@@ -28,25 +30,33 @@ namespace rc
       for(auto it : edges) {
         // Only add edges in one direction, so
         // the resulting graph is directed.
-        if (it.from > it.to)
-          b.add_edge(it.from, it.to, it.polarity);
+        int f = b.get_vertex(it.from);
+        int t = b.get_vertex(it.to);
+        if (f < t && t != b.g.one && t != b.g.zero)
+          b.add_edge(f, t, it.polarity);
       }
+      /*
       remove_in_edge_if(b.g.one, [](auto e){ return true; } , b.g.graph);
       remove_in_edge_if(b.g.zero, [](auto e){ return true; } , b.g.graph);
+      */
 
       // a reverse name map;
-      std::map<int, std::string> rev_map;
-      for(auto it : b.name_map) 
-        rev_map[it.second] = it.first;
-
       GD::vertex_iterator v, vend;
       for(boost::tie(v, vend) = boost::vertices(b.g.graph); v != vend; ++v) {
         if(in_degree(*v, b.g.graph) == 0)
-          b.inputs.push_back(rev_map[*v]);
+          b.inputs.push_back(b.g.graph[*v].identifier);
         if(out_degree(*v, b.g.graph) == 0)
-          b.outputs.push_back(rev_map[*v]);
+          b.outputs.push_back(b.g.graph[*v].identifier);
       }
     }
+
+    friend std::ostream & operator<<(std::ostream& out, const AG & ag) {
+      out << "// From Arbitrary Graph\n";
+      write_graph(out, ag.b);
+      return out;
+    }
+
+
   };
 
 
@@ -73,6 +83,7 @@ struct Arbitrary<AG> {
   static Gen<AG> arbitrary() {
 
     auto nodes = *gen::nonEmpty<std::vector<std::string>>();
+    std::unique(nodes.begin(), nodes.end());
 
     // Generator for edges, with edges from `nodes'
     auto gen_edge = gen::construct<AEdge>(

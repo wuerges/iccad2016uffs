@@ -42,8 +42,8 @@ void generate_match(Generator & g,
       inputs_2,
       output_1, 
       output_2;
-    g.generate_inputs(v1.inputs, inputs_1, v1.inputs.size());
-    g.generate_inputs(v2.inputs, inputs_2, v2.inputs.size());
+    g.generate_inputs(v1.inputs, inputs_1);
+    g.generate_inputs(v2.inputs, inputs_2);
 
     simulate(inputs_1, output_1, g1);
     simulate(inputs_2, output_2, g2);

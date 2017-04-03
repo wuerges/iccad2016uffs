@@ -27,7 +27,7 @@ int main(int nargs, char** argv){
 
   std::map<std::string, bool> input, output1, output2;
   Generator gen;
-  gen.generate_inputs(v.inputs, input, v.inputs.size());
+  gen.generate_inputs(v.inputs, input);
 
 
 
@@ -44,6 +44,14 @@ int main(int nargs, char** argv){
   for(auto it : v.outputs) {
     if (output1[it] != output2[it]) {
       std::cerr << "ERROR: output `" << it << "' differs\n";
+      std::cerr << "wire\tinput\n";
+      for(auto it : v.inputs) {
+        std::cerr << it << "\t" << input[it] << "\n";
+      }
+      std::cerr << "wire\toutput1\toutput2\n";
+      for(auto it : v.outputs) {
+        std::cerr << it << "\t" << output1[it] << "\t" << output2[it] << "\n";
+      }
       return -1;
     }
   }

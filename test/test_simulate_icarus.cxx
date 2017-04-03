@@ -17,7 +17,7 @@ int main(int nargs, char** argv){
   std::ofstream f;
   std::map<std::string, bool> input, output1;
   Generator gen;
-  gen.generate_inputs(v.inputs, input, v.inputs.size());
+  gen.generate_inputs(v.inputs, input);
   
   std::system(("rm s.v; cp " + std::string(argv[1]) + " s.v").c_str());
   

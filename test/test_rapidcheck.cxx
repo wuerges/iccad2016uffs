@@ -3,6 +3,7 @@
 #include <graph_model_arbitrary.hpp>
 #include <inputs_generator.hpp>
 #include <graph_simulator.hpp>
+#include <equivalence_check.hpp>
 
 #include <rapidcheck.h>
 
@@ -53,6 +54,15 @@ int main() {
       RC_ASSERT(output1 == output2);
 
     });
+
+
+  rc::check("checks that a graph is always equivalent to itself",
+    [](const G & g) {
+      
+      RC_ASSERT(equivalence_check(g, g));
+
+    });
+
 
 
 

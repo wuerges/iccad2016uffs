@@ -37,6 +37,8 @@ To compile it, run the following commands:
 
 ```
 git clone <url for this repo>
+cd <folder of the repo>
+git submodule init
 git submodule update
 cmake .
 make

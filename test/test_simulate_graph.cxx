@@ -25,9 +25,9 @@ int main(int nargs, char** argv){
   convert(v, b);
 
 
-  std::vector<bool> input, output1, output2;
+  std::map<std::string, bool> input, output1, output2;
   Generator gen;
-  gen.generate_inputs(input, v.inputs.size());
+  gen.generate_inputs(v.inputs, input, v.inputs.size());
 
 
 
@@ -41,9 +41,12 @@ int main(int nargs, char** argv){
   std::cout << "nand    Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " microseconds." << std::endl;
   std::cout << "Netlist Simulation: " << std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() << " microseconds." << std::endl;
   
-  if (output1 == output2)
-    return 0;
-  else 
-    return -1;
+  for(auto it : v.outputs) {
+    if (output1[it] != output2[it]) {
+      std::cerr << "ERROR: output `" << it << "' differs\n";
+      return -1;
+    }
+  }
+  return 0;
 
 }

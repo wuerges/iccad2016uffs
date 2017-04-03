@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <map>
 #include <sstream>
+#include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -16,6 +17,7 @@
 namespace verilog 
 {
   namespace graph {
+
 
     struct Node {
       LogicValue value = LogicValue::Undefined;
@@ -64,7 +66,9 @@ namespace verilog
           return it->second;
         }
         else {
-          return g.add_vertex(name);
+          int x = g.add_vertex(name);
+          name_map[name] = x;
+          return x;
         }
       }
 
@@ -99,10 +103,23 @@ namespace verilog
       }
 
       void add_vertex(std::string name) {
-        g.add_vertex(name);
+        get_vertex(name);
       }
 
     };
+
+    void write_graph(std::ostream & o, G_builder & b) {
+      boost::write_graphviz(std::cout, b.g.graph
+          , [&](std::ostream& o, const GD::vertex_descriptor& v) 
+          { o << "[label=" 
+              << b.g.graph[v].identifier 
+              << ": " 
+              << b.g.graph[v].value<< "]";}
+          , [&](std::ostream& o, const GD::edge_descriptor& e) 
+          { if (b.g.graph[e] == NegP::Negative)
+              o << "[style=dotted]"; }
+          );
+    }
   }
 }
 

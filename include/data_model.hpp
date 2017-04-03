@@ -16,16 +16,16 @@ namespace verilog {
   std::ostream & operator<<(std::ostream& o, LogicValue v) {
     switch(v) {
       case LogicValue::Zero:
-        o << "LV::Zero";
+        o << "0";
         break;
       case LogicValue::One:
-        o << "LV::One";
+        o << "1";
         break;
       case LogicValue::Undefined:
-        o << "LV::Undefined";
+        o << "X";
         break;
       case LogicValue::Invalid:
-        o << "LV::Invalid";
+        o << "I";
         break;
     }
     return o;

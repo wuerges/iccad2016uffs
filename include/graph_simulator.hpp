@@ -4,13 +4,13 @@
 #include <graph_model.hpp>
 
 #include <vector>
+#include <map>
 #include <iostream>
 #include <deque>
 #include <sstream>
 #include <stdexcept>
 #include <iterator>
 
-#include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
 
@@ -24,7 +24,9 @@ namespace verilog {
     }
 
 
-    void simulate(std::vector<bool> & inputs, std::vector<bool> & outputs, G_builder & b) {
+    void simulate(
+        std::map<std::string, bool> & inputs, 
+        std::map<std::string, bool> & outputs, G_builder & b) {
 
       G & g = b.g;
 		
@@ -33,17 +35,22 @@ namespace verilog {
       std::deque<int> topo_order;
       boost::topological_sort(g.graph, std::front_inserter(topo_order));
       //
-      //boost::write_graphviz(std::cout, g.graph);
-
-      // Initialize the inputs
-
-      for (int i = 0; i < b.inputs.size(); ++ i) {
-        g.graph[b.name_map[b.inputs[i]]].value = fromBool(inputs[i]);
-      }
 
       // Initialize the constants 
       g.graph[g.zero].value = LogicValue::Zero;
       g.graph[g.one].value = LogicValue::One;
+
+      //std::cout << "// initialized constants\n";
+      //write_graph(std::cout, b);
+
+      // Initialize the inputs
+      for (auto it : inputs) {
+        g.graph[b.get_vertex(it.first)].value = fromBool(it.second);
+      }
+
+      
+      //std::cout << "// initialized inputs\n";
+      //write_graph(std::cout, b);
 
       // Propagate the values to the outputs
       for (int node : topo_order) {
@@ -62,11 +69,14 @@ namespace verilog {
           g.graph[node].value = sum;
 
         }
+
+        //std::cout << "// executed " << node << "\n";
+        //write_graph(std::cout, b);
       }
 
       // output the outputs!
       for(std::string n : b.outputs) {
-        outputs.push_back(toBool(g.graph[b.name_map[n]].value));
+        outputs[n] = toBool(g.graph[b.get_vertex(n)].value);
       }
     }
   }

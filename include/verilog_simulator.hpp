@@ -112,9 +112,13 @@ namespace verilog {
     }
 
     
-    void simulate(std::vector<bool> &inputs, std::vector<bool> &outputs, Verilog &v) {
+    void simulate(
+        const std::map<std::string, bool> &inputs_p, 
+        std::map<std::string, bool> &outputs, Verilog &v) {
       int totalNodes = 0, i = 0;
          
+      std::vector<bool> inputs;
+      for(auto it: inputs_p) inputs.push_back(it.second);
       std::map<std::string,int> indexNodes;
       std::vector<node> nodes;
       
@@ -133,7 +137,7 @@ namespace verilog {
       }
       
       for(auto it : v.outputs)
-        outputs.push_back(nodes[indexNodes[it]].value); 
+        outputs[it] = nodes[indexNodes[it]].value;
     }
   }
 }

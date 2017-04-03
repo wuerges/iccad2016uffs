@@ -15,9 +15,9 @@ int main(int nargs, char** argv){
   ast::Verilog v;
   parser::parse_verilog_file(v, argv[1]);
   std::ofstream f;
-  std::vector<bool> input, output1;
+  std::map<std::string, bool> input, output1;
   Generator gen;
-  gen.generate_inputs(input, v.inputs.size());
+  gen.generate_inputs(v.inputs, input, v.inputs.size());
   
   std::system(("rm s.v; cp " + std::string(argv[1]) + " s.v").c_str());
   

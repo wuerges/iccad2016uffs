@@ -3,6 +3,7 @@
 #include <boost/random.hpp>
 
 #include <vector>
+#include <map>
 
 namespace verilog {
 
@@ -11,9 +12,12 @@ namespace verilog {
     boost::random::mt19937 rng;
     boost::random::bernoulli_distribution<> bd;
     //  Generates a random input of a given size
-    void generate_inputs(std::vector<bool> & inputs, int size) {
-      for (int i = 0; i < size; ++i) 
-        inputs.push_back(bd(rng));
+    void generate_inputs(
+        const std::vector<std::string> & names, 
+        std::map<std::string, bool> & inputs, int size) {
+      for(auto n : names) {
+        inputs[n] = bd(rng);
+      }
     }
   };
 

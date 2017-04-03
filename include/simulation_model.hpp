@@ -135,11 +135,11 @@ namespace solution {
     entropy_map count;
     int number_of_runs;
 
-    void account_for(vector<bool> result, vector<string> names) {
+    void account_for(const map<std::string, bool> & result) {
 
-      for(int i = 0; i < names.size(); ++i) {
-        if(result[i])
-          count[names[i]]++;
+      for(auto it : result) {
+        if(it.second)
+          count[it.first]++;
       }
 
       number_of_runs++;

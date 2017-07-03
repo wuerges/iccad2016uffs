@@ -13,6 +13,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/copy.hpp>
 
 namespace verilog 
 {
@@ -112,6 +113,29 @@ namespace verilog
       }
 
     };
+
+    void join_graph(const G & source, G_builder & target) {
+
+      typedef GD::vertex_descriptor vertex_t;
+      typedef boost::property_map<GD, boost::vertex_index_t>::type index_map_t;
+
+      //for simple adjacency_list<> this type would be more efficient:
+      typedef boost::iterator_property_map<typename std::vector<vertex_t>::iterator,
+              index_map_t,vertex_t,vertex_t&> IsoMap;
+
+      //maps vertices of g to vertices of g_copy
+      std::vector<vertex_t> isoValues( num_vertices(source.graph));
+      IsoMap mapV( isoValues.begin());
+
+      boost::copy_graph(source.graph, target.g.graph, boost::orig_to_copy(mapV));
+
+      GD::vertex_iterator v, vend;
+      for(boost::tie(v, vend) = boost::vertices(source.graph); v != vend; ++v) {
+        if(in_degree(*v, source.graph) == 0) {
+          target.g.add_edge(mapV[*v], target.get_vertex(source.graph[*v].identifier), NegP::Positive);
+        }
+      }
+    }
 
     void write_graph(std::ostream & out, const G_builder & b) {
       out << "// inputs:";

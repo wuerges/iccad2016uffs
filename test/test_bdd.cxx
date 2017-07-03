@@ -15,6 +15,7 @@ using namespace std::chrono;
 
 int main(int nargs, char** argv){
 
+  /*
   BDD a("a");
   BDD b("b");
 
@@ -23,6 +24,7 @@ int main(int nargs, char** argv){
   std::cout << a;
   std::cout << b;
   std::cout << c;
+  */
 
   return 0;
 }

@@ -106,7 +106,8 @@ namespace verilog
           for(const Node * x : layer) {
             const void * p = x;
             std::string fill = x->r_t >=0 ? "style=filled," : "";
-            out << "  \"" << p << "\" [" << fill << "label=\""<< x->s;
+            std::string box = (x->s == 0 || x ->s == 1) ? "shape=box," : "";
+            out << "  \"" << p << "\" [" << fill << box << "label=\""<< x->s;
             if(false) {
               out << ","<< p;
             }

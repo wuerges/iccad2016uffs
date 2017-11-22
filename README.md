@@ -22,6 +22,19 @@ Testing circuits is not easy and we need more tools to do it.
 
 ## Usage
 
+There are some simple tools to help with testing.
+
+For example, to generate the nand graph for a circuit:
+```
+./test/TestConvert1.x ../testcases/trivial/nand1.v  |dot -Tpng >nand.png
+```
+
+For example, to generate the shared bdds for a circuit:
+```
+./test/Test^CD.x ../testcases/trivial/nand1.v  |dot -Tpng >nand_bdd.png
+```
+
+
 Nothing much can be done yet.
 
 ## API Reference

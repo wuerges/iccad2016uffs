@@ -48,7 +48,6 @@ namespace verilog
     };
 
     struct BDD {
-      //vector<Node> graph;
       const Node * zero;
       const Node * one;
       std::map<int, vector<const Node*>> layers;
@@ -63,12 +62,6 @@ namespace verilog
       const Node * add_simple_input(int s) {
         return create_node(s, s, one, zero);
       }
-
-      /*int clone_node(int x) {
-        if(x == 0) return 0;
-        if(x == 1) return 1;
-      }
-      */
 
       const Node * negate(const Node * x) {
         if(x == zero) return one;
@@ -109,13 +102,15 @@ namespace verilog
 
       friend std::ostream& operator<<(std::ostream & out, const BDD & b) {
         out << "digraph G {\n";
-        //out << "  0 [shape=box,style=filled];\n";
-        //out << "  1 [shape=box,style=filled];\n";
         for(auto [s, layer] : b.layers) {
           for(const Node * x : layer) {
             const void * p = x;
             std::string fill = x->r_t >=0 ? "style=filled," : "";
-            out << "  \"" << p << "\" [" << fill << "label=\""<< x->s << ","<< p<< "\"];\n";
+            out << "  \"" << p << "\" [" << fill << "label=\""<< x->s;
+            if(false) {
+              out << ","<< p;
+            }
+            out << "\"];\n";
           }
           for(const Node * x : layer) {
             if(x!=b.zero && x != b.one) {
@@ -123,8 +118,13 @@ namespace verilog
               out << "  \"" << x << "\"->\"" << x->n << "\"[style=dotted];\n";
             }
           }
+          out << "  rank = same; ";
+          for(const Node * x : layer) {
+            out << "\"" << x << "\";";
+          }
+          out << "\n";
         }
-        out << "};\n";
+        out << "}\n";
         return out;
       }
     };

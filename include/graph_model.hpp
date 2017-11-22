@@ -150,7 +150,10 @@ namespace verilog
           { o << "[label=\"" 
               << b.g.graph[v].identifier 
               << ": " 
-              << b.g.graph[v].value<< "\"]";}
+              << v
+              << ": " 
+              << b.g.graph[v].value<< "\"]";
+              }
           , [&](std::ostream& o, const GD::edge_descriptor& e) 
           { if (b.g.graph[e] == NegP::Negative)
               o << "[style=dotted]"; }

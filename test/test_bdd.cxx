@@ -36,8 +36,8 @@ int main(int nargs, char** argv){
   printf("//x = %p, y = %p\n", x, y);
   z = bdds.conjunction(x, y);
   */
-
-  std::cout << bdds << '\n';
+  write_bdd(cout, bdds, b.g) << '\n';
+  //std::cout <<  << '\n';
 
   /*
   BDD a("a");

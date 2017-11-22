@@ -16,6 +16,7 @@ main(int nargs, char** argv)
 
     verilog::graph::G_builder g;
     verilog::convert(v, g);
+    verilog::graph::write_graph(std::cout, g);
   }
 
 }

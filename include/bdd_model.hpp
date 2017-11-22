@@ -74,7 +74,7 @@ namespace verilog
         if(x == zero) return one;
         if(x == one) return zero;
 
-        return create_node(x->s, -1, x->p, x->n);
+        return create_node(x->s, -1, negate(x->p), negate(x->n));
       }
 
       shared_ptr<Node> conjunction(
@@ -108,34 +108,6 @@ namespace verilog
         return x;
       }
 
-
-      friend std::ostream& operator<<(std::ostream & out, const BDD & b) {
-        out << "digraph G {\n";
-        for(auto [s, layer] : b.layers) {
-          for(auto x : layer) {
-            std::string fill = x->r_t >=0 ? "style=filled," : "";
-            std::string box = (x->s == 0 || x ->s == 1) ? "shape=box," : "";
-            out << "  \"" << x << "\" [" << fill << box << "label=\""<< x->s;
-            if(false) { // set this to true to view pointer addresses in the graph.
-              out << ","<< x;
-            }
-            out << "\"];\n";
-          }
-          for(auto x : layer) {
-            if(x!=b.zero && x != b.one) {
-              out << "  \"" << x << "\"->\"" << x->p << "\"\n";
-              out << "  \"" << x << "\"->\"" << x->n << "\"[style=dotted];\n";
-            }
-          }
-          out << "  rank = same; ";
-          for(auto x : layer) {
-            out << "\"" << x << "\";";
-          }
-          out << "\n";
-        }
-        out << "}\n";
-        return out;
-      }
     };
   }
 }

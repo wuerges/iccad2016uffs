@@ -17,10 +17,10 @@ int main(int nargs, char** argv){
 
 
   BDD bdds;
-  int x = bdds.add_simple_input(5);
-  int y = bdds.add_simple_input(6);
-  printf("//x = %d, y = %d\n", x, y);
-  bdds.conjunction(x, y);
+  const Node * x = bdds.add_simple_input(5);
+  const Node * y = bdds.add_simple_input(6);
+  printf("//x = %p, y = %p\n", x, y);
+  const Node * z = bdds.conjunction(x, y);
 
   std::cout << bdds << '\n';
 

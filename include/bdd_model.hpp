@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <map>
 #include <sstream>
+#include <string>
 /*#include <boost/tuple/tuple.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -31,32 +32,36 @@ namespace verilog
       /**
        * marks if this is a representative node.
        */
-      const bool r;
+      const int  r_t;
       /**
        * The positive edge for this node.
        */
-      const int p;
+      const Node * p;
       /**
        * The negative edge for this node.
        */
-      const int n;
-      Node(const int s_, const int r_, const int p_, const int n_): 
-        s(s_), r(r_), p(p_), n(n_)
+      const Node * n;
+      Node(const int s_, const int r_t_, const Node * p_, const Node * n_): 
+        s(s_), r_t(r_t_), p(p_), n(n_)
       {}
-      //Node(const int s_): s(s), r(true), p(1), n(0) {}
 
     };
 
     struct BDD {
-      vector<Node> graph;
+      //vector<Node> graph;
+      const Node * zero;
+      const Node * one;
+      std::map<int, vector<const Node*>> layers;
+
       BDD() { 
-        graph.emplace_back(0, true, 0, 1);
-        graph.emplace_back(1, true, 1, 0);
+        zero = new Node(0, 0, NULL, NULL);
+        one  = new Node(1, 1, NULL, NULL);
+        layers[0].push_back(zero);
+        layers[0].push_back(one);
       }
 
-      int add_simple_input(int s) {
-        graph.emplace_back(s, true, 1, 0);
-        return graph.size() - 1;
+      const Node * add_simple_input(int s) {
+        return create_node(s, s, one, zero);
       }
 
       /*int clone_node(int x) {
@@ -65,54 +70,59 @@ namespace verilog
       }
       */
 
-      int negate(int x) {
-        if(x == 0) return 1;
-        if(x == 1) return 0;
-        
-        int p = negate(graph[x].p);
-        int n = negate(graph[x].n);
-        graph.emplace_back(graph[x].s, false, p, n);
-        return graph.size() - 1;
+      const Node * negate(const Node * x) {
+        if(x == zero) return one;
+        if(x == one) return zero;
+
+        return create_node(x->s, -1, x->p, x->n);
       }
 
-      int conjunction(int x, int y) {
-        if(x == 1) return y;
-        if(y == 1) return x;
-        if(x == 0) return 0;
-        if(y == 0) return 0;
+      const Node * conjunction(const Node * x, const Node * y) {
+        if(x == one) return y;
+        if(y == one) return x;
+        if(x == zero) return zero;
+        if(y == zero) return zero;
 
-        if(graph[x].s == graph[y].s) {
-          int n = conjunction(graph[x].n, graph[y].n);
-          int p = conjunction(graph[x].p, graph[y].p);
-          graph.emplace_back(graph[x].s, false, n, p);
+        if(x->s == y->s) {
+          const Node * p = conjunction(x->p, y->p);
+          const Node * n = conjunction(x->n, y->n);
+          return create_node(x->s, -1, p, n);
         }
-        else if(graph[x].s < graph[y].s) {
-          int n = conjunction(x, graph[y].n);
-          int p = conjunction(x, graph[y].p);
-          graph.emplace_back(graph[y].s, false, n, p);
+        else if(x->s > y->s) {
+          const Node * p = conjunction(x->p, y);
+          const Node * n = conjunction(x->n, y);
+          return create_node(x->s, -1, p, n);
         }
-        else { // x > y
-          int n = conjunction(y, graph[y].n);
-          int p = conjunction(y, graph[y].p);
-          graph.emplace_back(graph[x].s, false, n, p);
+        else { // x < y
+          const Node * p = conjunction(y->p, x);
+          const Node * n = conjunction(y->n, x);
+          return create_node(y->s, -1, p, n);
         }
-        return graph.size() - 1;
+      }
+
+      const Node * create_node(int s, int r, const Node * p, const Node * n) {
+        const Node * x = new Node(s, r, p, n);
+        layers[s].push_back(x);
+        return x;
       }
 
 
       friend std::ostream& operator<<(std::ostream & out, const BDD & b) {
         out << "digraph G {\n";
-        out << "  0 [shape=box,style=filled];\n";
-        out << "  1 [shape=box,style=filled];\n";
-        for(int i = 2; i < b.graph.size(); ++i) {
-          if(b.graph[i].r)
-            out << "  " << i << " [style=filled,label=\""<< b.graph[i].s << ","<< i<< "\"];\n";
-          else 
-            out << "  " << i << " [label=\""<< b.graph[i].s << ","<< i<< " \"];\n";
-        }
-        for(int i = 2; i < b.graph.size(); ++i) {
-          out << "  " << i << "->" << b.graph[i].n << "[style=dotted];\n";
-          out << "  " << i << "->" << b.graph[i].p << "\n";
+        //out << "  0 [shape=box,style=filled];\n";
+        //out << "  1 [shape=box,style=filled];\n";
+        for(auto [s, layer] : b.layers) {
+          for(const Node * x : layer) {
+            const void * p = x;
+            std::string fill = x->r_t >=0 ? "style=filled," : "";
+            out << "  \"" << p << "\" [" << fill << "label=\""<< x->s << ","<< p<< "\"];\n";
+          }
+          for(const Node * x : layer) {
+            if(x!=b.zero && x != b.one) {
+              out << "  \"" << x << "\"->\"" << x->p << "\"\n";
+              out << "  \"" << x << "\"->\"" << x->n << "\"[style=dotted];\n";
+            }
+          }
         }
         out << "};\n";
         return out;

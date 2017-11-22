@@ -31,7 +31,7 @@ For example, to generate the nand graph for a circuit:
 
 For example, to generate the shared bdds for a circuit:
 ```
-./test/Test^CD.x ../testcases/trivial/nand1.v  |dot -Tpng >nand_bdd.png
+./test/TestBDD.x ../testcases/trivial/nand1.v  |dot -Tpng >nand_bdd.png
 ```
 
 

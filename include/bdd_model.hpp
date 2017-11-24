@@ -54,7 +54,8 @@ namespace verilog
     typedef shared_ptr<Node> Node_p;
 
     struct BDD {
-      std::shared_ptr<Node> zero, one;
+      Node_p zero, one;
+      vector<Node_p> index;
       //std::map<int, vector<shared_ptr<Node>>> layers;
 
       BDD():

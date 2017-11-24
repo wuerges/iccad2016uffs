@@ -4,6 +4,8 @@
 #include <bdd_model.hpp>
 #include <algorithm>
 #include <map>
+#include <queue>
+#include <unordered_map>
 #include <stdexcept>
 #include <memory>
 
@@ -16,11 +18,33 @@ namespace verilog {
   using namespace bdd;
   using std::shared_ptr;
   using std::vector;
+  using std::unordered_map;
+  using std::queue;
 
-  typedef vector<vector<shared_ptr<bdd::Node>>> layers_t;
+  typedef map<int, vector<shared_ptr<bdd::Node>>> layers_t;
 
-  void get_layers(const BDD & b, const G & g, layers_t & layers) {
-    assert(false && "Error: unimplemented");
+  void get_layers(const BDD & b, layers_t & layers) {
+    unordered_map<Node_p, bool> visited;
+    queue<Node_p> todo;
+    
+    for(Node_p node : b.index) {
+      todo.push(node);
+    }
+
+    while(!todo.empty()) {
+      Node_p aux = todo.front();
+      todo.pop();
+      if(visited[aux]) continue;
+      visited[aux] = true;
+      if(aux == b.zero || aux == b.one) {
+        layers[0].push_back(aux);
+      }
+      else {
+        if(!visited[aux->p]) todo.push(aux->p);
+        if(!visited[aux->n]) todo.push(aux->n);
+        layers[aux->s].push_back(aux);
+      }
+    }
   }
 
   std::ostream& write_bdd(std::ostream & out
@@ -29,8 +53,9 @@ namespace verilog {
       ) {
     out << "digraph G {\n";
     layers_t layers;
-    get_layers(b, g, layers);
-    for(auto layer : layers) {
+    get_layers(b, layers);
+    for(auto [key, layer] : layers) {
+      out << "// layer " << key << "\n";
       for(auto x : layer) {
         std::string fill = x->r_t >=0 ? "style=filled," : "";
         std::string box = (x->s == 0 || x ->s == 1) ? "shape=box," : "";
@@ -66,19 +91,20 @@ namespace verilog {
     std::deque<int> topo_order;
     boost::topological_sort(g.graph, std::front_inserter(topo_order));
 
-    vector<shared_ptr<bdd::Node>> index(num_vertices(g.graph));
+    bdds.index.clear();
+    bdds.index.resize(num_vertices(g.graph));
 
     int node_count = 0;
     for (int node : topo_order) {
       if(in_degree(node, g.graph) == 0) {
         if(node == g.one) {
-          index[node] = bdds.one;
+          bdds.index[node] = bdds.one;
         }
         else if(node == g.zero) {
-          index[node] = bdds.zero;
+          bdds.index[node] = bdds.zero;
         }
         else {
-          index[node] = bdds.add_simple_input(node);
+          bdds.index[node] = bdds.add_simple_input(node);
         }
       }
       else {
@@ -88,10 +114,10 @@ namespace verilog {
         for (auto e = p.first; e != p.second; ++e) {
           int s = source(*e, g.graph);
           if(NegP::Positive == g.graph[*e]) {
-            inputs.push_back(index[s]);
+            inputs.push_back(bdds.index[s]);
           }
           else {
-            inputs.push_back(bdds.negate(index[s]));
+            inputs.push_back(bdds.negate(bdds.index[s]));
           }
         }
 
@@ -101,7 +127,7 @@ namespace verilog {
         }
         shared_ptr<bdd::Node> result(
             bdds.create_node(aux->s, node, aux->p, aux->n));
-        index[node] = result;
+        bdds.index[node] = result;
       }
       node_count++;
       if(node_count % 1000 == 0) std::cerr << "built bdds for " << node_count << "/" << topo_order.size() <<" nodes.\n";

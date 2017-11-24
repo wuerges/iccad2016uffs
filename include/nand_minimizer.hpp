@@ -60,7 +60,7 @@ namespace verilog {
     std::deque<int> topo_order;
     boost::topological_sort(g.graph, std::front_inserter(topo_order));
 
-    vector<shared_ptr<bdd::Node>> index(num_vertices(g.graph));
+    //vector<shared_ptr<bdd::Node>> index(num_vertices(g.graph));
     layers_t layers;
     get_layers(b, layers);
 
@@ -102,6 +102,15 @@ namespace verilog {
             nodes[i]->n = nodes[0];
           }
         }
+      }
+    }
+    
+    for(auto & node : b.index) {
+      if(node->p && node->p->p
+          && node->p == node->n) {
+        std::cerr << "Case X reached \n" ;
+        merge_nodes(node, node->p, g, b);
+        node = node->p;
       }
     }
 

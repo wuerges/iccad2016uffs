@@ -38,7 +38,14 @@ int main(int nargs, char** argv){
   printf("//x = %p, y = %p\n", x, y);
   z = bdds.conjunction(x, y);
   */
-  write_bdd(cout, bdds, b.g) << '\n';
+
+  if(nargs > 2) {
+    verilog::graph::write_graph(std::cout, b);
+  }
+  else
+    write_bdd(cout, bdds, b.g) << '\n';
+
+
   //std::cout <<  << '\n';
 
   /*

@@ -44,11 +44,11 @@ namespace verilog {
           out << "  \"" << x << "\"->\"" << x->n << "\"[style=dotted];\n";
         }
       }
-      out << "  rank = same; ";
+      out << " { rank = same; ";
       for(auto x : layer) {
         out << "\"" << x << "\";";
       }
-      out << "\n";
+      out << "}\n";
     }
     out << "}\n";
     return out;

@@ -62,6 +62,7 @@ namespace verilog {
 
     vector<shared_ptr<bdd::Node>> index(num_vertices(g.graph));
 
+    int node_count = 0;
     for (int node : topo_order) {
       if(in_degree(node, g.graph) == 0) {
         if(node == g.one) {
@@ -96,6 +97,8 @@ namespace verilog {
             bdds.create_node(aux->s, node, aux->p, aux->n));
         index[node] = result;
       }
+      node_count++;
+      if(node_count % 1000 == 0) std::cerr << "built bdds for " << node_count << "/" << topo_order.size() <<" nodes.\n";
     }
   }
 

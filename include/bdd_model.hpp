@@ -34,7 +34,7 @@ namespace verilog
       /**
        * marks if this is a representative node.
        */
-      const int  r_t;
+      int  r_t;
       /**
        * @p is the positive edge for this node.
        * @n is the negative edge for this node.
@@ -51,10 +51,11 @@ namespace verilog
 
 
     };
+    typedef shared_ptr<Node> Node_p;
 
     struct BDD {
       std::shared_ptr<Node> zero, one;
-      std::map<int, vector<shared_ptr<Node>>> layers;
+      //std::map<int, vector<shared_ptr<Node>>> layers;
 
       BDD():
         zero(new Node(0, 0)),
@@ -62,8 +63,8 @@ namespace verilog
       { 
         //zero = new Node(0, 0, NULL, NULL);
         //one  = new Node(1, 1, NULL, NULL);
-        layers[0].push_back(zero);
-        layers[0].push_back(one);
+        //layers[0].push_back(zero);
+        //layers[0].push_back(one);
       }
 
       shared_ptr<Node> add_simple_input(int s) {
@@ -104,7 +105,7 @@ namespace verilog
 
       shared_ptr<Node> create_node(int s, int r, shared_ptr<Node> p, shared_ptr<Node> n) {
         shared_ptr<Node> x(new Node(s, r, p, n));
-        layers[s].push_back(x);
+        //layers[s].push_back(x);
         return x;
       }
 

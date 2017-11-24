@@ -11,20 +11,26 @@
 #include <boost/graph/topological_sort.hpp>
 
 namespace verilog {
-  /// For the NOT port, the input is the back
-  // The edges are Negative
 
   using namespace graph;
   using namespace bdd;
   using std::shared_ptr;
   using std::vector;
 
+  typedef vector<vector<shared_ptr<bdd::Node>>> layers_t;
+
+  void get_layers(const BDD & b, const G & g, layers_t & layers) {
+    assert(false && "Error: unimplemented");
+  }
+
   std::ostream& write_bdd(std::ostream & out
       , const BDD & b
       , const G & g
       ) {
     out << "digraph G {\n";
-    for(auto [s, layer] : b.layers) {
+    layers_t layers;
+    get_layers(b, g, layers);
+    for(auto layer : layers) {
       for(auto x : layer) {
         std::string fill = x->r_t >=0 ? "style=filled," : "";
         std::string box = (x->s == 0 || x ->s == 1) ? "shape=box," : "";

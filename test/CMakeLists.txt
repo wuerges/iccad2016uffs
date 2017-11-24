@@ -14,10 +14,16 @@ add_executable(TestSimulateIcarus.x test_simulate_icarus.cxx)
 add_executable(TestConvert1.x converts_a_verilog_to_a_graph.cxx)
 add_executable(simulation.x simulation.cxx)
 add_executable(TestBDD.x test_bdd.cxx)
+add_executable(TestMinimize.x test_bdd_minimize.cxx)
 
 add_executable(TestRapidCheck.x test_rapidcheck.cxx)
 target_link_libraries(TestRapidCheck.x rapidcheck)
 
+target_link_libraries(TestMinimize.x 
+  verilog_model
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+)
 target_link_libraries(TestBDD.x 
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}

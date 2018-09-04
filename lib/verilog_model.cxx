@@ -36,7 +36,7 @@ std::ostream& verilog::ast::operator<< (std::ostream& stream, const Opcode& op) 
   return stream;
 }
 
-Function:: Function(Opcode op_, auto par_): op(op_), parameters(par_) {}
+Function:: Function(Opcode op_, std::vector<std::string> par_): op(op_), parameters(par_) {}
 
 void Verilog::add_inputs(std::vector<std::string> const & vs) {
   inputs.insert(inputs.end(), vs.begin(), vs.end());

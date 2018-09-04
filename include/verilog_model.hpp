@@ -20,7 +20,7 @@ namespace verilog
     struct Function {
       Opcode op;
       std::vector<std::string> parameters;
-      Function(Opcode op_, auto par_);
+      Function(Opcode op_, std::vector<std::string> par_);
     };
     struct Verilog {
 

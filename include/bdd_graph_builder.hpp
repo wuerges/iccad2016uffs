@@ -81,13 +81,21 @@ struct BDD_Builder {
         bdd_nodes[node] = bdds.one;
       }
       else if(in_degree(node, g.graph) == 0) {
+        printf("// adding input node %d\n", node);
         bdd_nodes[node] = bdds.add_simple_input(g.graph[node].identifier);
       }
       else {
 
         //bdd_nodes[node] = sum_nodes_lor(node);
-        bdd_nodes[node] = sum_nodes(node);
-        //bdd_nodes[node] = sum_nodes_group_ands_and_ors(node);
+        //bdd_nodes[node] = sum_nodes(node);
+        bdd_nodes[node] = sum_nodes_group_ands_and_ors(node);
+
+        if(bdd_nodes[node]->r_t) {
+          printf("// replacing representative of node %p: %d -> %d\n", bdd_nodes[node], *bdd_nodes[node]->r_t, node);
+        }
+        else {
+          printf("// adding representative to node %p: %d\n", bdd_nodes[node], node);
+        }
         bdd_nodes[node]->r_t = node;
       }
     }

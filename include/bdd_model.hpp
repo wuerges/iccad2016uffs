@@ -94,8 +94,8 @@ namespace verilog
       }
 
       Node * land(Node * x, Node * y) {
-        if(x == one) return y;
-        if(y == one) return x;
+        if(x == one) return copy_of(y);
+        if(y == one) return copy_of(x);
         if(x == zero) return zero;
         if(y == zero) return zero;
 
@@ -116,11 +116,17 @@ namespace verilog
         }
       }
 
+      Node * copy_of(Node * x) {
+        return x;
+        // TODO check if this is good or bad.
+        //return create_node(x->s, x->p, x->n);
+      }
+
       Node * lor(Node * x, Node * y) {
         if(x == one) return one;
         if(y == one) return one;
-        if(x == zero) return y;
-        if(y == zero) return x;
+        if(x == zero) return copy_of(y);
+        if(y == zero) return copy_of(x);
 
         if(x->s == y->s) {
           Node * p = lor(x->p, y->p);
@@ -160,7 +166,7 @@ namespace verilog
         for(auto layer : b.layers) {
           for(const Node * x : layer) {
             const void * p = x;
-            std::string fill = x->r_t ? "style=filled," : "";
+            std::string fill = x->r_t.has_value() ? "style=filled," : "";
             std::string shape = x ==b.zero || x == b.one ? "shape=rectangle," : "";
             std::string variable = b.symbol_table_rev.find(x->s)->second;
             out << "  \"" << p << "\" [" << fill << shape << "label=\"" << variable << /*","<< p<< */"\"];\n";

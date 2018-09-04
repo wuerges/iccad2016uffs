@@ -11,20 +11,20 @@ namespace verilog
 //using namespace bdd;
 //using namespace graph;
 
-void build(bdd::BDD & bdds, graph::G & g) {
+void build(graph::G & g, bdd::BDD & bdds) {
   auto topo_order = topological_sort(g);
 
   std::vector<bdd::Node*> bdd_nodes(num_vertices(g.graph));
 
   for (int node : topo_order) {
-    if(in_degree(node, g.graph) == 0) {
-      bdd_nodes[node] = bdds.add_simple_input(g.graph[node].identifier);
-    }
-    else if(node == g.zero) {
+    if(node == g.zero) {
       bdd_nodes[node] = bdds.zero;
     }
     else if(node == g.one) {
       bdd_nodes[node] = bdds.one;
+    }
+    else if(in_degree(node, g.graph) == 0) {
+      bdd_nodes[node] = bdds.add_simple_input(g.graph[node].identifier);
     }
     else {
       auto p = in_edges(node, g.graph);
@@ -39,6 +39,7 @@ void build(bdd::BDD & bdds, graph::G & g) {
       }
 
       bdd_nodes[node] = sum;
+      bdd_nodes[node]->r_t = node;
     }
   }
 }

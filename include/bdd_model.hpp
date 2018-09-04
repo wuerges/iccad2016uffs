@@ -16,7 +16,6 @@ namespace verilog
 {
   namespace bdd {
     using std::vector;
-    vector<std::string> symbol_table;
 
     struct Node {
       /**
@@ -64,13 +63,24 @@ namespace verilog
       Node * zero;
       Node * one;
       vector<vector<Node*>> layers;
+      int index = 2;
+      std::map<std::string, int> symbol_table;
+      std::map<int, std::string> symbol_table_rev;
 
       BDD():zero(new Node(0)), one(new Node(1)), layers(2) {
         layers[0].push_back(zero);
         layers[1].push_back(one);
+        symbol_table_rev[0] = "Zero";
+        symbol_table_rev[1] = "One";
       }
 
-      Node * add_simple_input(int s) {
+      Node * add_simple_input(const std::string & variable) {
+        auto x = symbol_table.find(variable);
+        if(x == symbol_table.end()) {
+          symbol_table[variable] = index++;
+        }
+        int s = symbol_table[variable];
+        symbol_table_rev[s] = variable;
         return create_node(s, s, one, zero);
       }
 
@@ -81,25 +91,48 @@ namespace verilog
         return create_node(x->s, negate(x->p), negate(x->n));
       }
 
-      Node * conjunction(Node * x, Node * y) {
+      Node * land(Node * x, Node * y) {
         if(x == one) return y;
         if(y == one) return x;
         if(x == zero) return zero;
         if(y == zero) return zero;
 
         if(x->s == y->s) {
-          Node * p = conjunction(x->p, y->p);
-          Node * n = conjunction(x->n, y->n);
+          Node * p = land(x->p, y->p);
+          Node * n = land(x->n, y->n);
           return create_node(x->s, p, n);
         }
         else if(x->s > y->s) {
-          Node * p = conjunction(x->p, y);
-          Node * n = conjunction(x->n, y);
+          Node * p = land(x->p, y);
+          Node * n = land(x->n, y);
           return create_node(x->s, p, n);
         }
         else { // x < y
-          Node * p = conjunction(y->p, x);
-          Node * n = conjunction(y->n, x);
+          Node * p = land(y->p, x);
+          Node * n = land(y->n, x);
+          return create_node(y->s, p, n);
+        }
+      }
+
+      Node * lor(Node * x, Node * y) {
+        if(x == one) return one;
+        if(y == one) return one;
+        if(x == zero) return y;
+        if(y == zero) return x;
+
+        if(x->s == y->s) {
+          Node * p = lor(x->p, y->p);
+          Node * n = lor(x->n, y->n);
+          return create_node(x->s, p, n);
+        }
+        else if(x->s > y->s) {
+          Node * p = lor(x->p, y);
+          Node * n = lor(x->n, y);
+          return create_node(x->s, p, n);
+        }
+        else { // x < y
+          Node * p = lor(y->p, x);
+          Node * n = lor(y->n, x);
           return create_node(y->s, p, n);
         }
       }
@@ -120,13 +153,13 @@ namespace verilog
 
       friend std::ostream& operator<<(std::ostream & out, const BDD & b) {
         out << "digraph G {\n";
-        //out << "  0 [shape=box,style=filled];\n";
-        //out << "  1 [shape=box,style=filled];\n";
         for(auto layer : b.layers) {
           for(const Node * x : layer) {
             const void * p = x;
-            std::string fill = x->r_t >=0 ? "style=filled," : "";
-            out << "  \"" << p << "\" [" << fill << "label=\""<< x->s << ","<< p<< "\"];\n";
+            std::string fill = x->r_t ? "style=filled," : "";
+            std::string shape = x ==b.zero || x == b.one ? "shape=rectangle," : "";
+            std::string variable = b.symbol_table_rev.find(x->s)->second;
+            out << "  \"" << p << "\" [" << fill << shape << "label=\"" << variable << /*","<< p<< */"\"];\n";
           }
           for(const Node * x : layer) {
             if(x!=b.zero && x != b.one) {
@@ -135,7 +168,7 @@ namespace verilog
             }
           }
         }
-        out << "};\n";
+        out << "}\n";
         return out;
       }
     };

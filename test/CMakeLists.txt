@@ -18,52 +18,53 @@ add_executable(TestBDD.x test_bdd.cxx)
 add_executable(TestRapidCheck.x test_rapidcheck.cxx)
 target_link_libraries(TestRapidCheck.x rapidcheck)
 
-target_link_libraries(TestBDD.x 
+target_link_libraries(TestBDD.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
-target_link_libraries(TestSimulateIcarus.x 
+target_link_libraries(TestSimulateIcarus.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
-target_link_libraries(TestSimulateGraph.x 
+target_link_libraries(TestSimulateGraph.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
-target_link_libraries(TestParser1.x 
+target_link_libraries(TestParser1.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
-target_link_libraries(TestConvert1.x 
+target_link_libraries(TestConvert1.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
-target_link_libraries(simulation.x 
+target_link_libraries(simulation.x
   verilog_model
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
 
 
-# Novos testes devem ser adicionados aqui 
+# Novos testes devem ser adicionados aqui
 
 add_test(check_rapidcheck TestRapidCheck.x)
 add_test(check_if_spirit_runs TestSpirit1.x)
 add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)
+add_test(check_if_bdd_runs TestBDD.x)
 
 
-# Novos testes devem ser adicionados aqui 
-FOREACH(i 
+# Novos testes devem ser adicionados aqui
+FOREACH(i
 ./testcases/trivial/buf1.v
 ./testcases/trivial/or1.v
 ./testcases/trivial/and1.v
@@ -139,9 +140,6 @@ FOREACH(i
 ./testcases/unit17/in_2.v
 )
   # Commented for a while because it takes too much time to run
-  add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
-  add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
+  #add_test(check_if_simulator_runs_${i} TestSimulateGraph.x ../${i})
+  #add_test(check_if_parser_runs_${i} TestParser1.x ../${i})
 ENDFOREACH()
-
-
-

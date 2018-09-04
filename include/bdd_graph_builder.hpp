@@ -86,9 +86,10 @@ struct BDD_Builder {
       }
       else {
 
+        // TODO check which of these 3 is best.
         //bdd_nodes[node] = sum_nodes_lor(node);
-        //bdd_nodes[node] = sum_nodes(node);
-        bdd_nodes[node] = sum_nodes_group_ands_and_ors(node);
+        bdd_nodes[node] = sum_nodes(node);
+        //bdd_nodes[node] = sum_nodes_group_ands_and_ors(node);
 
         if(bdd_nodes[node]->r_t) {
           printf("// replacing representative of node %p: %d -> %d\n", bdd_nodes[node], *bdd_nodes[node]->r_t, node);

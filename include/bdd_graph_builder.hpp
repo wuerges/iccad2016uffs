@@ -36,10 +36,6 @@ void build(bdd::BDD & bdds, graph::G & g) {
         bdd::Node * s2 = g.graph[*e] == NegP::Positive ? s : bdds.negate(s);
 
         sum = bdds.land(sum, s);
-
-        // return np == NegP::Positive ? v : !v;
-        // LogicValue value = propagate(g.graph[s].value, g.graph[*e]);
-
       }
 
       bdd_nodes[node] = sum;

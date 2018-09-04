@@ -67,6 +67,8 @@ namespace verilog
       std::map<std::string, int> symbol_table;
       std::map<int, std::string> symbol_table_rev;
 
+      int number_of_nodes = 0;
+
       BDD():zero(new Node(0)), one(new Node(1)), layers(2) {
         layers[0].push_back(zero);
         layers[1].push_back(one);
@@ -138,6 +140,7 @@ namespace verilog
       }
 
       Node * create_node(int s, int r, Node * p, Node * n) {
+        number_of_nodes++;
         Node * x = new Node(s, r, p, n);
         if(layers.size() < s+1) layers.resize(s+1);
         layers[s].push_back(x);
@@ -145,6 +148,7 @@ namespace verilog
       }
 
       Node * create_node(int s, Node * p, Node * n) {
+        number_of_nodes++;
         Node * x = new Node(s, p, n);
         if(layers.size() < s+1) layers.resize(s+1);
         layers[s].push_back(x);

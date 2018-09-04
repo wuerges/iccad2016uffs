@@ -33,9 +33,11 @@ int main(int nargs, char** argv){
 
   graph::G_builder b;
   convert(v, b);
-  build(b.g, bdds);
+  BDD_Builder bdd_b(b.g, bdds);
+  bdd_b.build();
 
   std::cout << bdds << '\n';
+  std::cout << "// number of nodes = " << bdds.number_of_nodes << '\n';
 
   /*
   BDD a("a");

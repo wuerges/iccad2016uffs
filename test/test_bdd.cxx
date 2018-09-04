@@ -1,4 +1,5 @@
-#include <bdd_model.hpp>
+#include "bdd_model.hpp"
+#include "bdd_graph_builder.hpp"
 
 #include <iostream>
 #include <fstream>

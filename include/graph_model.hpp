@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <data_model.hpp>
@@ -15,7 +14,7 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/copy.hpp>
 
-namespace verilog 
+namespace verilog
 {
   namespace graph {
 
@@ -28,9 +27,9 @@ namespace verilog
     };
 
     typedef boost::adjacency_list<
-      boost::setS, 
-      boost::vecS, 
-      boost::bidirectionalS, 
+      boost::setS,
+      boost::vecS,
+      boost::bidirectionalS,
       Node, NegP> GD;
 
     struct G {
@@ -49,13 +48,13 @@ namespace verilog
       int new_vertex() {
         return boost::add_vertex(graph);
       }
-  
+
       void add_edge(int a, int b, NegP p) {
         boost::add_edge(a, b, p, graph);
       }
 
     };
-    
+
     struct G_builder  {
       G g;
       std::map<const std::string, int> name_map;
@@ -92,13 +91,13 @@ namespace verilog
         int v2 = get_vertex(name2);
         g.add_edge(v1, v2, p);
       }
-      
+
       void add_edge(std::string name1, std::string name2, NegP p) {
         int v1 = get_vertex(name1);
         int v2 = get_vertex(name2);
         g.add_edge(v1, v2, p);
       }
-      
+
       void add_edge(std::string name1, int v2, NegP p) {
         int v1 = get_vertex(name1);
         g.add_edge(v1, v2, p);
@@ -146,16 +145,15 @@ namespace verilog
       out << "\n";
 
       boost::write_graphviz(out, b.g.graph
-          , [&](std::ostream& o, const GD::vertex_descriptor& v) 
-          { o << "[label=\"" 
-              << b.g.graph[v].identifier 
-              << ": " 
+          , [&](std::ostream& o, const GD::vertex_descriptor& v)
+          { o << "[label=\""
+              << b.g.graph[v].identifier
+              << ": "
               << b.g.graph[v].value<< "\"]";}
-          , [&](std::ostream& o, const GD::edge_descriptor& e) 
+          , [&](std::ostream& o, const GD::edge_descriptor& e)
           { if (b.g.graph[e] == NegP::Negative)
               o << "[style=dotted]"; }
           );
     }
   }
 }
-

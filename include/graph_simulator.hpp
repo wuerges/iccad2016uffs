@@ -1,7 +1,8 @@
 #pragma once
 
-#include <data_model.hpp>
-#include <graph_model.hpp>
+#include "data_model.hpp"
+#include "graph_model.hpp"
+#include "graph_algorithm.hpp"
 
 #include <vector>
 #include <map>
@@ -14,6 +15,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
 
+
 namespace verilog {
   namespace graph {
 
@@ -25,18 +27,19 @@ namespace verilog {
 
 
     void simulate(
-        std::map<std::string, bool> & inputs, 
+        std::map<std::string, bool> & inputs,
         std::map<std::string, bool> & outputs, G_builder & b) {
 
       G & g = b.g;
-		
-      using namespace boost;
-	  
-      std::deque<int> topo_order;
-      boost::topological_sort(g.graph, std::front_inserter(topo_order));
-      //
 
-      // Initialize the constants 
+      // using namespace boost;
+      //
+      // std::deque<int> topo_order;
+      // boost::topological_sort(g.graph, std::front_inserter(topo_order));
+      //
+      std::deque<int> topo_order = topological_sort(g);
+
+      // Initialize the constants
       g.graph[g.zero].value = LogicValue::Zero;
       g.graph[g.one].value = LogicValue::One;
 
@@ -48,7 +51,7 @@ namespace verilog {
         g.graph[b.get_vertex(it.first)].value = fromBool(it.second);
       }
 
-      
+
       //std::cout << "// initialized inputs\n";
       //write_graph(std::cout, b);
 

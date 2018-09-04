@@ -29,7 +29,7 @@ namespace verilog
       /**
        * If this node is a representative, r_t stores it.
        */
-      const std::optional<int>  r_t;
+      std::optional<int>  r_t;
       /**
        * The positive edge for this node.
        */

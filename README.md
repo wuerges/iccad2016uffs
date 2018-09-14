@@ -48,9 +48,6 @@ make
 
 We are using ICCAD 2015 and ICCAD 2016 inputs as benchmarks. They are carachterized in the following table:
 
-
-##BENCHMARK'S TABLE
-
 |TEST|GATES|INPUTS|OUTPUTS|FUNCTION|AND|NAND|OR|NOR|XOR|XNOR|NOT|BUF|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |in_2.v|4|3|1|6|0(0.00%)|4(66.67%)|1(16.67%)|0(0.00%)|0(0.00%)|0(0.00%)|0(0.00%)|1(16.67%)|

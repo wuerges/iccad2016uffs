@@ -59,9 +59,21 @@ target_link_libraries(simulation.x
 
 add_test(check_rapidcheck TestRapidCheck.x)
 add_test(check_if_spirit_runs TestSpirit1.x)
-add_test(check_if_converter_runs TestConvert1.x ../testcases/BDD/in_1.v)
-add_test(check_if_bdd_runs TestBDD.x)
 
+FOREACH(i
+./testcases/trivial/buf1.v
+./testcases/trivial/or1.v
+./testcases/trivial/and1.v
+./testcases/trivial/not1.v
+./testcases/trivial/nand1.v
+./testcases/BDD/in_1.v
+./testcases/BDD/in_2.v
+./testcases/BDD_wrong/in_1.v
+./testcases/BDD_wrong/in_2.v
+)
+add_test(check_if_converter_runs TestConvert1.x ../${i})
+add_test(check_if_bdd_runs TestBDD.x ../${i})
+ENDFOREACH()
 
 # Novos testes devem ser adicionados aqui
 FOREACH(i

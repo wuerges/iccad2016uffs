@@ -16,8 +16,18 @@ namespace verilog
 {
   namespace bdd {
     using std::vector;
+    using std::map;
+    using std::pair;
+    using std::optional;
+    // using std::set;
 
     struct Node {
+      //
+
+      // key get_key() {
+      //   return key(s, {p, n});
+      // }
+
       /**
        * Index of the node's input in the symbol table
        * s == 0 -> for the special node 0.
@@ -29,7 +39,7 @@ namespace verilog
       /**
        * If this node is a representative, r_t stores it.
        */
-      std::optional<int>  r_t;
+      optional<int>  r_t;
       /**
        * The positive edge for this node.
        */
@@ -39,12 +49,8 @@ namespace verilog
        */
       Node * n;
 
-      Node(const int s_, const int r_t_, Node * p_, Node * n_):
+      Node(const int s_, Node * p_, Node * n_, optional<int> r_t_ = optional<int>()):
         s(s_), r_t(r_t_), p(p_), n(n_)
-      {}
-
-      Node(const int s_, Node * p_, Node * n_):
-        s(s_), p(p_), n(n_)
       {}
 
       /**
@@ -58,20 +64,22 @@ namespace verilog
 
     };
 
+    typedef pair<Node*, Node*> sib;
+
     struct BDD {
       //vector<Node> graph;
       Node * zero;
       Node * one;
-      vector<vector<Node*>> layers;
+      vector<map<sib, Node*>> layers;
       int index = 2;
-      std::map<std::string, int> symbol_table;
-      std::map<int, std::string> symbol_table_rev;
+      map<std::string, int> symbol_table;
+      map<int, std::string> symbol_table_rev;
 
       int number_of_nodes = 0;
 
       BDD():zero(new Node(0)), one(new Node(1)), layers(2) {
-        layers[0].push_back(zero);
-        layers[1].push_back(one);
+        layers[0][{zero,zero}] = zero;
+        layers[1][{one,one}] = one;
         symbol_table_rev[0] = "Zero";
         symbol_table_rev[1] = "One";
       }
@@ -83,7 +91,7 @@ namespace verilog
         }
         int s = symbol_table[variable];
         symbol_table_rev[s] = variable;
-        return create_node(s, s, one, zero);
+        return create_node(s, one, zero, s);
       }
 
       Node * negate(Node * x) {
@@ -122,6 +130,66 @@ namespace verilog
         //return create_node(x->s, x->p, x->n);
       }
 
+      int height(Node*x) {
+        return layers.size();
+      }
+
+//       def get_items(self):
+// if self.x == 0 or self.x == 1:
+//   return [self.get_item()]
+// return [self.get_item()] + self.neg.get_items() + self.pos.get_items()
+
+
+      /**
+       *
+       */
+      Node * check_equivalent(Node * x) {
+        if (x == one || x == zero) return x;
+        if (x->p == x->n) return x->p;
+        return x;
+      }
+
+      void check_sons(Node * x) {
+        if(x == one || x == zero) return;
+        Node *xp = check_equivalent(x->p);
+        Node *xn = check_equivalent(x->n);
+        if(x->p != xp || x->n != xn){
+          x->p = xp;
+          x->n = xp;
+          layers[x->s].erase(sib{x->p, x->n});
+          layers[x->s][sib{xp, xn}] = x; // TODO this may overwrite a node
+        }
+      }
+
+      /**
+       * WARNING: This is really slow O(2^n)
+       */
+
+      void simplify_slow(Node * z) {
+      // vector<vector<Node*>> layers;
+        for(int l = 1; l < layers.size(); ++l) {
+          for(int i = 0; i < layers[l].size(); ++i) {
+          }
+        }
+
+    // def simplify(z):
+    //   for h in range(z.height()):
+    //     #phase 1: remove redundant
+    //     z = z.remove_redundant()
+    //
+    //     #phase 2: remove equals
+    //     bdds = z.get_items()
+    //     x = {}
+    //     for k, v in bdds:
+    //       if not k in bdds:
+    //         x[k] = v
+    //     for k, v in x.items():
+    //       v.pos = x[v.pos.get_key()]
+    //       v.neg = x[v.neg.get_key()]
+    //
+    //     return z
+      }
+
       Node * lor(Node * x, Node * y) {
         if(x == one) return one;
         if(y == one) return one;
@@ -145,33 +213,43 @@ namespace verilog
         }
       }
 
-      Node * create_node(int s, int r, Node * p, Node * n) {
-        number_of_nodes++;
-        Node * x = new Node(s, r, p, n);
-        if(layers.size() < s+1) layers.resize(s+1);
-        layers[s].push_back(x);
-        return x;
-      }
+      /**
+      * Won't actually create a node if not needed.
+      */
 
-      Node * create_node(int s, Node * p, Node * n) {
-        number_of_nodes++;
-        Node * x = new Node(s, p, n);
+      Node * create_node(int s, Node * p, Node * n, optional<int> r = optional<int>()) {
         if(layers.size() < s+1) layers.resize(s+1);
-        layers[s].push_back(x);
-        return x;
+        auto it = layers[s].find(sib{p,n});
+        if(it == layers[s].end()) {
+          Node * x = new Node(s, p, n, r);
+          number_of_nodes++;
+          layers[s][sib{p,n}] = x;
+          return x;
+        }
+        else {
+          if(r) {
+            if(it->second->r_t) {
+              // TODO Both have representatives!
+            }
+            else {
+              it->second->r_t = r;
+            }
+          }
+          return it->second;
+        }
       }
 
       friend std::ostream& operator<<(std::ostream & out, const BDD & b) {
         out << "digraph G {\n";
         for(auto layer : b.layers) {
-          for(const Node * x : layer) {
+          for(auto [k, x] : layer) {
             const void * p = x;
             std::string fill = x->r_t.has_value() ? "style=filled," : "";
             std::string shape = x ==b.zero || x == b.one ? "shape=rectangle," : "";
             std::string variable = b.symbol_table_rev.find(x->s)->second;
             out << "  \"" << p << "\" [" << fill << shape << "label=\"" << variable << /*","<< p<< */"\"];\n";
           }
-          for(const Node * x : layer) {
+          for(auto [k,x] : layer) {
             if(x!=b.zero && x != b.one) {
               out << "  \"" << x << "\"->\"" << x->p << "\"\n";
               out << "  \"" << x << "\"->\"" << x->n << "\"[style=dotted];\n";
